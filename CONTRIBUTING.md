@@ -1,5 +1,9 @@
 # Contributing
 
+## Daily updates
+
+At the end of each day's active development session, update `docs/DAILY_UPDATES.md` with completed work, verification results and the next tasks, then commit and push the reviewed changes to the current working branch. The user has requested ongoing pushes as implementation progresses. Keep unfinished features clearly marked and exclude secrets and local artifacts. This is a development-session workflow, not an unattended scheduled job.
+
 All application implementation is Python. Keep project-specific code under `projects/<name>/src`, tests under `projects/<name>/tests`, and planning under that project's `docs` directory. Do not add a JavaScript or TypeScript application to this repository.
 
 Before implementation, select a task from the active phase, check its dependencies and write down the behavior its acceptance criteria require. Use branches such as `phase-1/P1-03-candidate-profile` and include the task ID in commits and pull requests.
