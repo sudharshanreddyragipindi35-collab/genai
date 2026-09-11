@@ -1,18 +1,4 @@
-{% extends "base.html" %}
-{% block title %}My target · InterviewForge{% endblock %}
-{% block content %}
-<section class="page-heading"><span class="eyebrow">SET YOUR DIRECTION</span><h1>Build your preparation target</h1><p>This preview helps define the first candidate profile. Database saving comes next.</p></section>
-{% if profile %}
-<div class="success-banner"><strong>Preview created for {{ profile.name }}.</strong> {{ profile.hours_per_day }} hour(s) per day toward {{ profile.target_date }}. This has not been saved yet.</div>
-{% endif %}
-<div class="form-layout">
-  <form class="panel form-card" method="post" action="/onboarding">
-    <label>Your name<input name="name" minlength="2" maxlength="60" required placeholder="Sudharshan"></label>
-    <label>Experience level<select name="experience"><option>Student / fresher</option><option>1–3 years</option><option>3–7 years</option><option>7+ years</option></select></label>
-    <div class="form-row"><label>Company<input value="Amazon" disabled></label><label>Language<input value="Python" disabled></label></div>
-    <div class="form-row"><label>Hours per day<input type="number" name="hours_per_day" min="1" max="8" value="1" required></label><label>Target date<input type="date" name="target_date" required></label></div>
-    <button class="button primary" type="submit">Preview my plan <span>→</span></button>
-  </form>
-  <aside class="panel side-card"><span class="eyebrow">INITIAL SCOPE</span><h2>Focused by design</h2><p>The first version supports Amazon-style preparation for software engineering roles using Python.</p><ul><li>Diagnostic assessment</li><li>Adaptive daily roadmap</li><li>Python coding practice</li><li>AI interview coaching</li></ul></aside>
-</div>
-{% endblock %}
+{% extends "base.html" %}{% block title %}Amazon target · InterviewForge{% endblock %}{% block content %}
+<section class="page-heading"><span class="eyebrow">AMAZON SELECTED</span><h1>When is your exam or interview?</h1><p>Your date and available time determine the pace of your three-level roadmap.</p></section>{% if error %}<div class="error-banner">{{ error }}</div>{% endif %}
+<div class="form-layout"><form class="panel form-card" method="post" action="/onboarding"><label>Your name<input name="name" minlength="2" maxlength="60" required value="{{ profile.name if profile else '' }}" placeholder="Sudharshan"></label><label>Current experience<select name="experience"><option>Student / fresher</option><option>1–3 years</option><option>3–7 years</option><option>7+ years</option></select></label><div class="form-row"><label>Company<input value="Amazon" disabled></label><label>Practice language<input value="Python" disabled></label></div><div class="form-row"><label>Hours available each day<input type="number" name="hours_per_day" min="1" max="8" value="{{ profile.hours_per_day if profile else 1 }}" required></label><label>Exam or interview date<input type="date" name="target_date" value="{{ profile.target_date if profile else '' }}" required></label></div><button class="button primary" type="submit">Create and save my roadmap <span>→</span></button></form>
+<aside class="panel side-card"><span class="eyebrow">WHAT HAPPENS NEXT</span><h2>A gated preparation journey</h2><ol><li>Level 1 foundations</li><li>Level 2 problem-solving patterns</li><li>Level 3 timed readiness</li><li>Coding assessment unlocks</li><li>Interview stage unlocks after assessment</li></ol></aside></div>{% endblock %}

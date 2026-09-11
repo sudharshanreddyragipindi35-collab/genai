@@ -1,5 +1,18 @@
 # Daily updates
 
+## 2026-09-12 Amazon roadmap and progression
+
+Completed:
+
+- Added company selection that opens Amazon-specific onboarding and asks for the exam or interview date.
+- Added a saved three-level Python roadmap based on experience, target date, and available study hours.
+- Added enforced level sequencing, task completion tracking, readiness calculation, and assessment/interview unlock gates.
+- Connected roadmap planning to the Deep Agents supervisor when Claude is available, with a deterministic local planning fallback.
+- Added a Streamable HTTP MCP client for external LeetCode `search_problems` calls, validation of returned problem metadata, and explicit MCP versus curated source labels.
+- Kept the Amazon Coach available throughout the preparation journey.
+
+Verification: all 25 tests pass, lint passes, and the repository structure check passes. The LeetCode MCP endpoint remains optional until its local server URL is configured.
+
 ## 2026-09-12 Claude connection diagnosis
 
 Completed:

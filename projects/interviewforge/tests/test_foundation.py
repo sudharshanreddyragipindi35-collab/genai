@@ -94,13 +94,13 @@ def test_basic_application_pages_are_visible():
     with TestClient(create_app(config)) as client:
         dashboard = client.get("/")
         assert dashboard.status_code == 200
-        assert "Good evening, Sudharshan" in dashboard.text
-        assert "Start today’s practice" in dashboard.text
+        assert "Start with your interview date" in dashboard.text
+        assert "Choose Amazon" in dashboard.text
 
         practice = client.get("/practice")
         assert practice.status_code == 200
-        assert "Two Sum" in practice.text
-        assert "Code runner comes in Phase 2" in practice.text
+        assert "Level-based LeetCode practice" in practice.text
+        assert "Create your Amazon roadmap first" in practice.text
 
         coach = client.get("/coach")
         assert coach.status_code == 200
@@ -140,12 +140,13 @@ def test_coach_status_never_exposes_key():
         "model": "anthropic:claude-sonnet-5",
         "configured": True,
         "amazon_mcp_configured": False,
+        "leetcode_mcp_configured": False,
     }
     assert "private-claude-key" not in response.text
 
 
-def test_onboarding_builds_an_explicit_unsaved_preview():
-    config = Settings(_env_file=None)
+def test_onboarding_saves_roadmap_and_redirects(tmp_path):
+    config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
     with TestClient(create_app(config)) as client:
         response = client.post(
             "/onboarding",
@@ -153,9 +154,10 @@ def test_onboarding_builds_an_explicit_unsaved_preview():
                 "name": "Sudharshan",
                 "experience": "1–3 years",
                 "hours_per_day": "2",
-                "target_date": "2026-10-30",
+                "target_date": "2099-10-30",
             },
+            follow_redirects=False,
         )
-    assert response.status_code == 200
-    assert "Preview created for Sudharshan" in response.text
-    assert "This has not been saved yet" in response.text
+    assert response.status_code == 303
+    assert response.headers["location"] == "/roadmap"
+    assert "Sudharshan" in (tmp_path / "state.json").read_text(encoding="utf-8")

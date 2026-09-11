@@ -1,5 +1,6 @@
 """Typed startup configuration; credentials are never included in error output."""
 
+from pathlib import Path
 from typing import Literal
 
 from pydantic import AliasChoices, Field, SecretStr, ValidationError, field_validator
@@ -24,6 +25,9 @@ class Settings(BaseSettings):
     )
     amazon_mcp_server_url: str | None = None
     amazon_mcp_tool: str = "search_amazon_company_knowledge"
+    leetcode_mcp_server_url: str | None = None
+    leetcode_mcp_tool: str = "search_problems"
+    local_state_path: Path = Path(".interviewforge/state.json")
 
     @property
     def claude_ready(self) -> bool:

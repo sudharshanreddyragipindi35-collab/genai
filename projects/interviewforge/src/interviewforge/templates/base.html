@@ -1,38 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}InterviewForge{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='coach.css') }}">
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="/"><span class="brand-mark">IF</span><span>InterviewForge</span></a>
-      <nav aria-label="Main navigation">
-        <a class="nav-item {{ 'active' if active == 'dashboard' }}" href="/"><span>⌂</span> Dashboard</a>
-        <a class="nav-item {{ 'active' if active == 'onboarding' }}" href="/onboarding"><span>◎</span> My target</a>
-        <a class="nav-item {{ 'active' if active == 'practice' }}" href="/practice"><span>⌘</span> Practice</a>
-        <a class="nav-item {{ 'active' if active == 'coach' }}" href="/coach"><span>✦</span> Amazon coach</a>
-        <span class="nav-item disabled"><span>◇</span> Assessments <small>Soon</small></span>
-        <span class="nav-item disabled"><span>◌</span> Interviews <small>Soon</small></span>
-      </nav>
-      <div class="sidebar-note">
-        <span class="eyebrow">BUILD STATUS</span>
-        <strong>Phase 1 foundation</strong>
-        <div class="progress"><span style="width:20%"></span></div>
-        <p>Core application shell is ready for your review.</p>
-      </div>
-    </aside>
-    <main>
-      <header class="topbar">
-        <div><span class="status-dot"></span> Local preview</div>
-        <a class="avatar" href="/onboarding" aria-label="Open candidate profile">SR</a>
-      </header>
-      <div class="content">{% block content %}{% endblock %}</div>
-    </main>
-  </div>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}InterviewForge{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', path='app.css') }}"><link rel="stylesheet" href="{{ url_for('static', path='coach.css') }}"></head><body>
+<div class="app-shell"><aside class="sidebar"><a class="brand" href="/"><span class="brand-mark">IF</span><span>InterviewForge</span></a><nav aria-label="Main navigation">
+<a class="nav-item {{ 'active' if active == 'dashboard' }}" href="/"><span>⌂</span> Dashboard</a>
+<a class="nav-item {{ 'active' if active == 'onboarding' }}" href="/companies"><span>◎</span> Company target</a>
+<a class="nav-item {{ 'active' if active == 'roadmap' }}" href="/roadmap"><span>▤</span> Roadmap</a>
+<a class="nav-item {{ 'active' if active == 'practice' }}" href="/practice"><span>⌘</span> Coding practice</a>
+<a class="nav-item {{ 'active' if active == 'coach' }}" href="/coach"><span>✦</span> Amazon coach</a>
+</nav><div class="sidebar-note"><span class="eyebrow">ACTIVE TARGET</span><strong>Amazon · Python</strong><p>Roadmap, coding assessment, and interview gates are tracked in this local preview.</p></div></aside>
+<main><header class="topbar"><div><span class="status-dot"></span> Local application</div><a class="avatar" href="/onboarding" aria-label="Open candidate profile">SR</a></header><div class="content">{% block content %}{% endblock %}</div></main></div></body></html>

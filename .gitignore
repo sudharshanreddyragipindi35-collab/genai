@@ -7,6 +7,7 @@ venv/
 .env
 .env.*
 !.env.example
+.interviewforge/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/

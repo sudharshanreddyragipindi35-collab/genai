@@ -2,7 +2,7 @@
 
 InterviewForge is a planned AI-powered interview preparation product with persistent candidate progress, source-grounded company guidance, adaptive Python practice and hiring-journey simulations.
 
-**Status: basic Phase 1 application preview with an Amazon-only coach shell; not a working MVP.** See the [development guide](docs/DEVELOPMENT.md) to run it.
+**Status: working local Phase 1 application slice with Amazon onboarding, a tracked roadmap, Claude coaching, and LeetCode MCP problem retrieval.** See the [development guide](docs/DEVELOPMENT.md) to run it.
 
 ## Delivery order
 
@@ -17,4 +17,15 @@ InterviewForge is a planned AI-powered interview preparation product with persis
 
 The application starts with one company target and Python coding. Multi-company expansion, other coding languages, deep system-design workspace, billing, mobile apps and specialist model training are deferred.
 
-See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). The Amazon-only boundary is enforced before model invocation and in the MCP knowledge adapter. Authentication, persisted preparation features, a real reviewed Amazon MCP source, and live LLM invocation are next.
+See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). The Amazon-only boundary is enforced before model invocation and in the MCP knowledge adapter. Authentication, PostgreSQL candidate ownership, a scored coding assessment, and reviewed Amazon knowledge retrieval remain future work.
+The current local application supports an Amazon-only candidate journey:
+
+1. Select Amazon and enter the exam or interview date, experience, and daily study time.
+2. Receive a saved three-level Python preparation roadmap.
+3. Complete tasks in order to unlock the coding assessment.
+4. Complete the assessment to unlock the interview simulation stage.
+5. Ask the Amazon coach questions at any time; allowed questions use Claude through Deep Agents when configured.
+
+Roadmap progress is saved to the ignored `.interviewforge/state.json` local-preview file. Production persistence and candidate ownership remain PostgreSQL work.
+
+Public coding problems can be synchronized through a configured Streamable HTTP LeetCode MCP server. Until it is connected, the UI identifies its bundled public links as `curated`; it never represents them as MCP results.
