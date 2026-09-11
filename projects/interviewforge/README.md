@@ -17,4 +17,4 @@ InterviewForge is a planned AI-powered interview preparation product with persis
 
 The application starts with one company target and Python coding. Multi-company expansion, other coding languages, deep system-design workspace, billing, mobile apps and specialist model training are deferred.
 
-See [architecture](docs/ARCHITECTURE.md) and [requirements mapping](docs/REQUIREMENTS.md). `src/interviewforge` now contains API startup, typed configuration, health/readiness checks and request logging. Authentication and user-facing preparation features are next-phase work.
+See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). `src/interviewforge` now contains API startup, typed configuration, health/readiness checks, request logging, and the Deep Agents integration foundation. Authentication and persisted preparation features are next.

@@ -17,6 +17,7 @@ The first target remains Amazon-style preparation with Python coding. This is a 
 ## Decisions made for this repository
 
 - Use Python for application code, UI authoring, services, workers and evaluation tools.
+- Use Deep Agents/LangGraph for complex agentic workflows and include practical LLM, RAG, memory, evaluation and ML concepts throughout the product.
 - Adapt the source's Next.js/TypeScript frontend to a Python-authored UI. Validate its suitability during Phase 1 before committing to strict browser assessment features.
 - Keep FastAPI and PostgreSQL as the planned API and persistent data foundations from the source.
 - Start with a modular monolith and separate isolated execution infrastructure, rather than many microservices.

@@ -92,6 +92,12 @@ def test_basic_application_pages_are_visible():
         assert "Two Sum" in practice.text
         assert "Code runner comes in Phase 2" in practice.text
 
+        ai_system = client.get("/ai-system")
+        assert ai_system.status_code == 200
+        assert "Deep agent roles" in ai_system.text
+        assert "Hybrid RAG" in ai_system.text
+        assert "AI advises; verified systems decide" in ai_system.text
+
 
 def test_onboarding_builds_an_explicit_unsaved_preview():
     config = Settings(_env_file=None)

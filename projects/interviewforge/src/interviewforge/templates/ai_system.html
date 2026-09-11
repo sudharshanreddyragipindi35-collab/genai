@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}AI system · InterviewForge{% endblock %}
+{% block content %}
+<section class="page-heading ai-heading">
+  <span class="eyebrow">GENAI ARCHITECTURE</span>
+  <h1>Intelligence with evidence and control.</h1>
+  <p>InterviewForge combines agentic workflows, retrieval, learning science, and deterministic product rules.</p>
+</section>
+<section class="ai-flow panel" aria-label="AI request flow">
+  <div><span>01</span><strong>Understand</strong><small>Intent + candidate state</small></div>
+  <b>→</b><div><span>02</span><strong>Retrieve</strong><small>Approved source evidence</small></div>
+  <b>→</b><div><span>03</span><strong>Reason</strong><small>Supervisor + specialists</small></div>
+  <b>→</b><div><span>04</span><strong>Verify</strong><small>Policy + rubric checks</small></div>
+  <b>→</b><div><span>05</span><strong>Learn</strong><small>Evidence-based progress</small></div>
+</section>
+<div class="ai-grid">
+  <section>
+    <div class="section-label"><span class="eyebrow">SPECIALIST TEAM</span><h2>Deep agent roles</h2></div>
+    <div class="capability-list">
+      {% for agent in agents %}
+      <article class="panel capability-card"><div class="agent-icon">{{ loop.index }}</div><div><h3>{{ agent.name }}</h3><p>{{ agent.purpose }}</p></div><span class="phase-tag">{{ agent.status }}</span></article>
+      {% endfor %}
+    </div>
+  </section>
+  <section>
+    <div class="section-label"><span class="eyebrow">INTELLIGENCE LAYERS</span><h2>GenAI and ML concepts</h2></div>
+    <div class="concept-grid">
+      {% for item in capabilities %}
+      <article class="panel concept-card"><span class="phase-tag">{{ item.status }}</span><h3>{{ item.name }}</h3><p>{{ item.purpose }}</p></article>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+<section class="panel guardrail"><div class="guard-icon">✓</div><div><span class="eyebrow">CONTROL BOUNDARY</span><h3>AI advises; verified systems decide.</h3><p>Code correctness, timers, permissions, mastery updates, and interview unlocks are calculated outside the model and preserved as auditable evidence.</p></div></section>
+{% endblock %}

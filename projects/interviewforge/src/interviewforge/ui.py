@@ -6,6 +6,8 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from interviewforge.ai import AGENT_TEAM, AI_CAPABILITIES
+
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
 
@@ -59,4 +61,18 @@ def practice(request: Request):
         request=request,
         name="practice.html",
         context=page_context(request, "practice"),
+    )
+
+
+@router.get("/ai-system", response_class=HTMLResponse)
+def ai_system(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="ai_system.html",
+        context=page_context(
+            request,
+            "ai-system",
+            agents=AGENT_TEAM,
+            capabilities=AI_CAPABILITIES,
+        ),
     )

@@ -1,5 +1,17 @@
 # Daily updates
 
+## 2026-09-11 Agentic AI direction
+
+Completed:
+
+- Made Deep Agents on LangGraph the planned runtime for multi-step coaching and interview workflows.
+- Defined the coach supervisor, knowledge verifier, learning strategist, code reviewer and evaluation critic roles in Python.
+- Added an optional, provider-neutral Deep Agents factory that performs no model call until configured.
+- Documented hybrid RAG, context engineering, structured generation, durable memory, model routing, evaluation, observability and calibrated learning-model concepts.
+- Added a visible AI System page to the running application so the planned intelligence and its control boundaries are reviewable.
+
+Next: implement database persistence and candidate ownership, then connect reviewed knowledge retrieval and the first grounded agent workflow in Phase 2.
+
 ## 2026-09-11 Application foundation
 
 Completed:

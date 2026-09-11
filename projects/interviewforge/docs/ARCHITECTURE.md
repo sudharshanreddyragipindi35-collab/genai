@@ -15,10 +15,13 @@ Begin with a modular Python application, one persistent database and clearly iso
 | Retrieval | PostgreSQL full-text baseline; pgvector when semantic retrieval is added | Filter source approval, region, role and freshness before generation |
 | Background jobs | Python worker; Redis queue when asynchronous workloads require it | Bounded retries and idempotent completion prevent duplicate effects |
 | AI gateway | Provider-neutral Python interface | Validated response schemas, prompt versions, timeouts, budgets and trace IDs |
+| Agent runtime | Deep Agents SDK on LangGraph | Multi-step coaching, specialist delegation, durable state, streaming and human review |
 | Code runner | External hardened execution service behind a Python adapter | Never run submitted Python inside the UI, API or ordinary worker process |
 | Reports | Python generation from immutable evidence snapshots | Phase 5; numerical values come from stored calculations |
 
 These are planned choices, not installed dependencies or claims of a production-ready stack. Resolve compatible versions, lock them and review official documentation during implementation.
+
+See the [GenAI and machine learning architecture](GENAI_ARCHITECTURE.md) for the agent team, RAG path, personalization models and evaluation gates.
 
 The Python-only requirement applies to authored application code. Browser internals and infrastructure can use their own runtimes. If a strict editor, fullscreen or focus-event requirement cannot be met by the chosen Python UI without custom JavaScript, record that as a scope decision before Phase 3. Do not silently introduce a TypeScript frontend or claim complete browser proctoring.
 

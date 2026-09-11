@@ -14,6 +14,14 @@ uv run --locked interviewforge
 
 Open `http://127.0.0.1:8000/docs` to try the API. The command binds only to the local machine. Run it from the project directory so `.env` is loaded from the expected location. Stop the server with Ctrl+C.
 
+To install the agent runtime when developing LLM workflows:
+
+```powershell
+uv sync --extra agents --locked
+```
+
+This installs the locked Deep Agents, LangGraph, LangChain, and OpenAI model adapter packages. It does not make a model call or require an API key until an agent is invoked.
+
 If using the repository-local tool environment created during development, replace `uv` with `../../.tools/Scripts/uv.exe`. The tool environment is ignored and is not required in another checkout.
 
 ## Configuration
@@ -31,6 +39,7 @@ The basic application starts without a database so it can be reviewed immediatel
 - `GET /`: visible candidate dashboard and application navigation.
 - `GET /onboarding`: target setup preview; submitted values are explicitly not persisted yet.
 - `GET /practice`: first Python problem experience; code execution is explicitly disabled until the secure runner is implemented.
+- `GET /ai-system`: reviewable map of the Deep Agents roles and GenAI/ML capability layers.
 - `GET /health`: 200 while the application is alive, without requiring a database or model.
 - `GET /ready`: performs `SELECT 1`; returns 200 when the database is reachable or 503 when unavailable. This checks connectivity, not migration/schema readiness yet.
 - `/docs` and `/openapi.json`: available outside production for development.
