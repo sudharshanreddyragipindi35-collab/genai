@@ -85,6 +85,16 @@ async def search_amazon_company_knowledge(company: str, query: str) -> dict:
 
 
 @server.tool()
+async def amazon_document_collection() -> dict:
+    """Fetch the approved official corpus for local RAG indexing."""
+    results = await asyncio.gather(
+        *(asyncio.to_thread(fetch_source, key) for key in SOURCES), return_exceptions=True
+    )
+    sources = [item for item in results if isinstance(item, dict)]
+    return {"company": "amazon", "sources": sources, "expected_sources": len(SOURCES)}
+
+
+@server.tool()
 def amazon_reported_coding_questions(role: str) -> dict:
     """Return the reviewed Amazon interview-report registry, not live company tags."""
     if role not in REPORTS:

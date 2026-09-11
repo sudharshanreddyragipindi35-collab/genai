@@ -1,5 +1,16 @@
 # Daily updates
 
+## Amazon RAG knowledge base
+
+- Added persistent public-document snapshots retrieved from the owned Amazon MCP bridge.
+- Indexed all five approved official Amazon pages with timestamps and content hashes.
+- Added overlapping passage chunking and lexical TF-IDF-style ranking; no embedding service or model fine-tuning.
+- Added automatic due refresh on questions and hourly background checks while running; the default freshness interval is 24 hours.
+- Retained the last complete snapshot on partial retrieval failures and kept conversations outside the trusted corpus.
+- Added /knowledge and projects/interviewforge/docs/AMAZON_RAG.md to explain sources and update behavior.
+- Validation: 36 tests pass; live indexing retrieved all five documents.
+
+
 ## Structured chatbot explanations
 
 - Rendered Markdown headings, numbered steps, bullet lists, fenced Python, and dry-run tables in both coach screens.

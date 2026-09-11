@@ -45,7 +45,7 @@ def test_unattributed_questions_are_never_added():
         complete_task(roadmap, "l2-amazon-code")
 
 
-def test_unknown_mcp_sources_do_not_enter_prompt():
+def test_unknown_mcp_sources_do_not_enter_prompt(tmp_path):
     async def fake(*args):
         return {
             "company": "amazon",
@@ -54,7 +54,12 @@ def test_unknown_mcp_sources_do_not_enter_prompt():
 
     with patch("interviewforge.ai.amazon_client.call_amazon", fake):
         assert knowledge_context(
-            Settings(_env_file=None, amazon_mcp_server_url="http://localhost"), "LP"
+            Settings(
+                _env_file=None,
+                amazon_mcp_server_url="http://localhost",
+                knowledge_path=tmp_path / "rag.json",
+            ),
+            "LP",
         ) == ("", ())
 
 
@@ -69,6 +74,7 @@ def test_sync_uses_role_registry_and_rejects_unattributed_results(tmp_path, monk
         _env_file=None,
         local_state_path=tmp_path / "state.json",
         amazon_mcp_server_url="http://local-mcp",
+        environment="test",
     )
     RoadmapStore(config.local_state_path).save(plan(role="SDE II"))
 

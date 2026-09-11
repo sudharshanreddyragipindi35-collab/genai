@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}
+<section class="page-heading"><span class="eyebrow">AMAZON KNOWLEDGE</span><h1>Answers grounded in public documentation</h1><p>The coach retrieves relevant passages from official Amazon pages and links its sources.</p></section>
+<section class="panel form-card"><h2>{{ knowledge.source_count }} of {{ knowledge.expected_sources }} documents indexed</h2><p>Last successful refresh: {{ knowledge.last_successful_refresh or "Waiting for first refresh" }}</p><p>Automatic refresh is checked every {{ knowledge.refresh_hours }} hours while the app runs, and on questions when due. If a source fails, the previous dated snapshot is retained. This updates reference knowledge, not Claude's model weights.</p>{% for source in knowledge.sources %}<article><h3><a href="{{ source.url }}" target="_blank" rel="noopener">{{ source.title }}</a></h3><p>Fetched {{ source.retrieved_at }}</p></article>{% endfor %}</section>
+{% endblock %}

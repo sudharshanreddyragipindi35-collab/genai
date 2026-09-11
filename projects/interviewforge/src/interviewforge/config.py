@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     amazon_mcp_tool: str = "search_amazon_company_knowledge"
     leetcode_mcp_server_url: str | None = None
     leetcode_mcp_tool: str = "search_problems"
+    knowledge_path: Path = Path(".interviewforge/amazon_knowledge.json")
+    knowledge_refresh_hours: int = Field(default=24, ge=1, le=168)
     local_state_path: Path = Path(".interviewforge/state.json")
 
     @property

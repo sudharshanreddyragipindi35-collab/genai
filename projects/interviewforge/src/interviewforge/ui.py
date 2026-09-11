@@ -314,3 +314,16 @@ def coach_status(request: Request):
         "amazon_mcp_configured": bool(settings.amazon_mcp_server_url),
         "leetcode_mcp_configured": bool(settings.leetcode_mcp_server_url),
     }
+
+
+@router.get("/knowledge", response_class=HTMLResponse)
+def knowledge_page(request: Request):
+    from interviewforge.ai.rag import knowledge_status
+
+    return templates.TemplateResponse(
+        request=request,
+        name="knowledge.html",
+        context=page_context(
+            request, "knowledge", knowledge=knowledge_status(request.app.state.settings)
+        ),
+    )

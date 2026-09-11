@@ -115,7 +115,7 @@ def answer_amazon_question(
             model=settings.llm_model,
         )
     if source_urls:
-        text += "\n\nOfficial Amazon sources retrieved through MCP:\n" + "\n".join(
+        text += "\n\nOfficial Amazon source snapshots used (RAG via MCP):\n" + "\n".join(
             f"- [Amazon source {index}]({url})" for index, url in enumerate(source_urls, 1)
         )
     return CoachAnswer(text=text, kind="live", model=settings.llm_model)

@@ -1,5 +1,6 @@
 """API lifecycle, liveness, database readiness and request correlation."""
 
+import asyncio
 import json
 import logging
 from contextlib import asynccontextmanager
@@ -33,9 +34,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 pool_pre_ping=True,
             )
         app.state.engine = engine
+
+        async def refresh_knowledge():
+            from interviewforge.ai.rag import refresh
+
+            while True:
+                await asyncio.to_thread(refresh, config)
+                await asyncio.sleep(3600)
+
+        knowledge_task = (
+            asyncio.create_task(refresh_knowledge())
+            if config.environment != "test" and config.amazon_mcp_server_url
+            else None
+        )
         try:
             yield
         finally:
+            if knowledge_task:
+                knowledge_task.cancel()
+                try:
+                    await knowledge_task
+                except asyncio.CancelledError:
+                    pass
             if engine is not None:
                 engine.dispose()
 
