@@ -12,11 +12,13 @@ from fastapi.templating import Jinja2Templates
 
 from interviewforge.ai.amazon_client import call_amazon
 from interviewforge.ai.coach import answer_amazon_question
+from interviewforge.formatting import render_answer
 from interviewforge.roadmap import PracticeProblem, apply_mcp_problems, build_roadmap, complete_task
 from interviewforge.state import RoadmapStore
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
+templates.env.filters["answer_markdown"] = render_answer
 logger = logging.getLogger("interviewforge.mcp")
 
 

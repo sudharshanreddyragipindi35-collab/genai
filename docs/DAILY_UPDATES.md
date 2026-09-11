@@ -1,5 +1,15 @@
 # Daily updates
 
+## Structured chatbot explanations
+
+- Rendered Markdown headings, numbered steps, bullet lists, fenced Python, and dry-run tables in both coach screens.
+- Updated the coach's response instructions to use short explanations, concrete examples, state-by-state dry runs, complexity, and a check-your-understanding question.
+- Kept hint-only answers concise and full solutions conditional on the user's request.
+- Added responsive response styling with scrolling for wide code blocks and tables.
+- Disabled raw HTML and embedded images in model output; tested unsafe links and markup.
+- Validation: 34 tests, lint, and repository checks pass.
+
+
 ## Amazon-specific learning and MCP sources
 
 - Replaced generic coding-first plans with role, skill, experience, date, and time-based learning plans.
