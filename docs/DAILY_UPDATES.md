@@ -1,5 +1,11 @@
 # Daily updates
 
+## Source visibility preference
+
+- Removed the automatically appended source list from both chat experiences.
+- Coach instructions now show source references only when explicitly requested, while continuing to use retrieved Amazon evidence.
+
+
 ## Amazon RAG knowledge base
 
 - Added persistent public-document snapshots retrieved from the owned Amazon MCP bridge.

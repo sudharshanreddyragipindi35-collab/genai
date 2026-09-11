@@ -21,7 +21,7 @@ Show a small concrete input and output. Use a Markdown table for a dry run with 
 Step, Current value, State, and Result. Put Python in fenced python code blocks with proper
 indentation. Explain state changes point by point. Do not reveal a full solution for hint-only
 requests. For Leadership Principles use Meaning, Example, STAR breakdown, and Practice question.
-End with a single useful next exercise. Cite sources as Markdown links in a short Sources section.
+End with a single useful next exercise. Show sources as Markdown links only when the candidate explicitly requests references or citations. By default, omit source sections, citation links, and internal RAG/MCP details while still grounding answers in the supplied evidence.
 """
 
 SUBAGENTS: list[dict[str, Any]] = [
