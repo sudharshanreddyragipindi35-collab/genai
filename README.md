@@ -4,7 +4,7 @@ A repository for Python-based generative AI projects, developed in reviewable ph
 
 ## Current status
 
-Planning and repository scaffold only. Phase 1 and Phase 2 are **not implemented**. No live LLM integration, authentication, code execution, or deployed application is included yet.
+Phase 1 implementation has started with a visible application shell plus the API and configuration foundation. Authentication, persisted candidate profiles, live LLM integration and code execution are not implemented yet. Phase 2 remains planned.
 
 ## Projects
 
@@ -22,16 +22,15 @@ Every project's application code, jobs, evaluation tools and tests must be Pytho
 4. Begin [Phase 2](projects/interviewforge/docs/PHASE_2.md) after the Phase 1 exit review.
 5. Use the [full roadmap](projects/interviewforge/docs/ROADMAP.md) for subsequent releases.
 
-## Local scaffold
+## Local development
 
-Python 3.11 or newer is the initial project baseline. From the repository root:
+InterviewForge uses Python 3.13 and a committed dependency lock. Follow the [development guide](projects/interviewforge/docs/DEVELOPMENT.md) to install and start the API. The repository checker can be run from the repository root:
 
 ```powershell
-python projects/interviewforge/src/interviewforge/__main__.py
 python scripts/check_repository.py
 ```
 
-The first command prints the planning status; it does not start the product. Phase implementation will add installation and application startup commands. No API key is needed for the current scaffold.
+No LLM API key is required for the foundation. The API exposes `/health`, `/ready` and local development documentation at `/docs`.
 
 ## Working agreement
 

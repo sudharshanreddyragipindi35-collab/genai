@@ -2,7 +2,7 @@
 
 InterviewForge is a planned AI-powered interview preparation product with persistent candidate progress, source-grounded company guidance, adaptive Python practice and hiring-journey simulations.
 
-**Status: planning scaffold, not a working MVP.**
+**Status: basic Phase 1 application preview implemented; not a working MVP.** See the [development guide](docs/DEVELOPMENT.md) to run it.
 
 ## Delivery order
 
@@ -17,4 +17,4 @@ InterviewForge is a planned AI-powered interview preparation product with persis
 
 The application starts with one company target and Python coding. Multi-company expansion, other coding languages, deep system-design workspace, billing, mobile apps and specialist model training are deferred.
 
-See [architecture](docs/ARCHITECTURE.md) and [requirements mapping](docs/REQUIREMENTS.md). `src/interviewforge` contains only a status entry point at this stage.
+See [architecture](docs/ARCHITECTURE.md) and [requirements mapping](docs/REQUIREMENTS.md). `src/interviewforge` now contains API startup, typed configuration, health/readiness checks and request logging. Authentication and user-facing preparation features are next-phase work.

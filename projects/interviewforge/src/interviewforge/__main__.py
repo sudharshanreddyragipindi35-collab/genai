@@ -1,11 +1,19 @@
-"""Report repository status without starting external services."""
+"""Start the local InterviewForge API."""
+
+import logging
+
+import uvicorn
+
+from interviewforge.app import create_app
 
 
 def main() -> None:
-    print("InterviewForge: planning scaffold")
-    print("Phase 1: foundation and core data - planned")
-    print("Phase 2: grounded learning and practice - planned")
-    print("Start with projects/interviewforge/docs/PHASE_1.md")
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    try:
+        app = create_app()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from None
+    uvicorn.run(app, host="127.0.0.1", port=8000, access_log=False)
 
 
 if __name__ == "__main__":

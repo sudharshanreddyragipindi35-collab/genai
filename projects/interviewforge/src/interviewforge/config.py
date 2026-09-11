@@ -1,0 +1,42 @@
+"""Typed startup configuration; credentials are never included in error output."""
+
+from typing import Literal
+
+from pydantic import Field, SecretStr, ValidationError, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="INTERVIEWFORGE_", env_file=".env", extra="ignore", hide_input_in_errors=True
+    )
+
+    environment: Literal["development", "test", "production"] = "development"
+    database_url: SecretStr | None = None
+    db_connect_timeout: int = Field(default=3, ge=1, le=10)
+
+    @field_validator("database_url")
+    @classmethod
+    def validate_database_url(cls, value: SecretStr | None) -> SecretStr | None:
+        if value is None:
+            return None
+        try:
+            url = make_url(value.get_secret_value())
+            valid = url.drivername == "postgresql+psycopg" and bool(url.host and url.database)
+        except (ArgumentError, TypeError, ValueError):
+            valid = False
+        if not valid:
+            raise ValueError("Use a postgresql+psycopg URL with host and database")
+        return value
+
+
+def load_settings() -> Settings:
+    try:
+        return Settings()
+    except ValidationError as exc:
+        fields = ", ".join(".".join(map(str, item["loc"])) for item in exc.errors())
+        raise RuntimeError(
+            f"Invalid configuration: {fields}. Check INTERVIEWFORGE_ variables and .env.example."
+        ) from None

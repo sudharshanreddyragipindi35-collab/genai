@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}InterviewForge{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark">IF</span><span>InterviewForge</span></a>
+      <nav aria-label="Main navigation">
+        <a class="nav-item {{ 'active' if active == 'dashboard' }}" href="/"><span>⌂</span> Dashboard</a>
+        <a class="nav-item {{ 'active' if active == 'onboarding' }}" href="/onboarding"><span>◎</span> My target</a>
+        <a class="nav-item {{ 'active' if active == 'practice' }}" href="/practice"><span>⌘</span> Practice</a>
+        <span class="nav-item disabled"><span>◇</span> Assessments <small>Soon</small></span>
+        <span class="nav-item disabled"><span>◌</span> Interviews <small>Soon</small></span>
+      </nav>
+      <div class="sidebar-note">
+        <span class="eyebrow">BUILD STATUS</span>
+        <strong>Phase 1 foundation</strong>
+        <div class="progress"><span style="width:20%"></span></div>
+        <p>Core application shell is ready for your review.</p>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div><span class="status-dot"></span> Local preview</div>
+        <a class="avatar" href="/onboarding" aria-label="Open candidate profile">SR</a>
+      </header>
+      <div class="content">{% block content %}{% endblock %}</div>
+    </main>
+  </div>
+</body>
+</html>

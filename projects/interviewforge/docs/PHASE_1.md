@@ -1,6 +1,6 @@
 # Phase 1 Foundation and core data
 
-**Status: planned.** Goal: a runnable Python foundation where an authenticated candidate can save a profile and Python target, and an authorized administrator can manage reviewed company/topic/problem records.
+**Status: in progress.** P1-01 and P1-02 are complete. A visible, non-persistent application shell has started P1-08. Goal: a runnable Python foundation where an authenticated candidate can save a profile and Python target, and an authorized administrator can manage reviewed company/topic/problem records.
 
 This phase combines source roadmap Phase 0 (setup) and Phase 1 (core backend). The source allocates approximately 4–5 weeks total; treat that as a reference, not a commitment. Re-estimate after the UI and authentication spikes using actual available hours.
 
@@ -27,8 +27,8 @@ This phase combines source roadmap Phase 0 (setup) and Phase 1 (core backend). T
 
 ## Implementation checklist
 
-- [ ] P1-01 Runtime and dependency foundation
-- [ ] P1-02 API and configuration
+- [x] P1-01 Runtime and dependency foundation
+- [x] P1-02 API and configuration
 - [ ] P1-03 Identity/profile schema
 - [ ] P1-04 Authentication and ownership enforcement
 - [ ] P1-05 Content and knowledge schema
@@ -37,6 +37,8 @@ This phase combines source roadmap Phase 0 (setup) and Phase 1 (core backend). T
 - [ ] P1-08 Python UI proof
 - [ ] P1-09 CI and integration verification
 - [ ] P1-10 Operational handoff
+
+P1-08 progress: dashboard, target preview and practice preview are implemented. Persistence, authenticated sessions and admin content review remain before this task can be completed.
 
 ## Proposed API slice
 

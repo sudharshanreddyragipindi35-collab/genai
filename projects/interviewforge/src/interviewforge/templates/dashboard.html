@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · InterviewForge{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="eyebrow">AMAZON · SOFTWARE ENGINEER · PYTHON</span>
+    <h1>Good evening, Sudharshan.</h1>
+    <p>Build interview confidence one focused session at a time.</p>
+  </div>
+  <a class="button primary" href="/practice">Start today’s practice <span>→</span></a>
+</section>
+
+<section class="metrics" aria-label="Preparation summary">
+  <article><span>Readiness</span><strong>18<small>%</small></strong><em class="positive">Foundation stage</em></article>
+  <article><span>Study streak</span><strong>1<small> day</small></strong><em>Keep the rhythm</em></article>
+  <article><span>Problems solved</span><strong>0<small> / 30</small></strong><em>First task is ready</em></article>
+  <article><span>Target date</span><strong class="date">30 Oct</strong><em>7 weeks remaining</em></article>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel today">
+    <div class="panel-head"><div><span class="eyebrow">TODAY</span><h2>Your focused plan</h2></div><span class="time-pill">55 min</span></div>
+    <div class="task featured">
+      <div class="task-icon">01</div>
+      <div><span class="task-type">CONCEPT · 15 MIN</span><h3>Understand arrays and complexity</h3><p>Build the base for efficient problem solving in Python.</p></div>
+      <a href="/practice" aria-label="Start concept">→</a>
+    </div>
+    <div class="task">
+      <div class="task-icon">02</div>
+      <div><span class="task-type">PRACTICE · 30 MIN</span><h3>Two Sum</h3><p>Use a hash map to reduce lookup time.</p></div>
+      <a href="/practice" aria-label="Start problem">→</a>
+    </div>
+    <div class="task">
+      <div class="task-icon">03</div>
+      <div><span class="task-type">REFLECTION · 10 MIN</span><h3>Explain your approach</h3><p>Practice clear interview communication.</p></div>
+      <span class="lock">Locked</span>
+    </div>
+  </section>
+
+  <section class="panel journey">
+    <div class="panel-head"><div><span class="eyebrow">YOUR JOURNEY</span><h2>Amazon preparation</h2></div><a href="/onboarding">Edit</a></div>
+    <ol>
+      <li class="current"><span>1</span><div><strong>Foundation</strong><small>In progress</small></div></li>
+      <li><span>2</span><div><strong>Guided practice</strong><small>Unlock after diagnostic</small></div></li>
+      <li><span>3</span><div><strong>Online assessment</strong><small>Planned for Phase 3</small></div></li>
+      <li><span>4</span><div><strong>Interview rounds</strong><small>Planned for Phase 4</small></div></li>
+    </ol>
+  </section>
+</div>
+
+<section class="panel insight">
+  <div class="spark">✦</div><div><span class="eyebrow">FORGE INSIGHT</span><h3>Start with evidence, then personalize.</h3><p>Your diagnostic assessment will replace this preview with a roadmap based on your actual strengths, available time, and target role.</p></div>
+</section>
+{% endblock %}
