@@ -1,8 +1,10 @@
 """Amazon coach invocation boundary for live Claude responses."""
 
+import json
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import SecretStr
 
@@ -10,12 +12,18 @@ from interviewforge.ai.amazon_scope import enforce_amazon_scope
 from interviewforge.ai.deep_agent import create_coach_agent
 from interviewforge.config import Settings
 
+logger = logging.getLogger("interviewforge.ai")
+
 
 @dataclass(frozen=True)
 class CoachAnswer:
     text: str
-    live_model: bool
+    kind: Literal["live", "policy", "offline", "error"]
     model: str | None = None
+
+    @property
+    def live_model(self) -> bool:
+        return self.kind == "live"
 
 
 def _message_text(message: Any) -> str:
@@ -44,7 +52,7 @@ def answer_amazon_question(
     decision = enforce_amazon_scope(question)
     if not decision.allowed:
         return CoachAnswer(
-            text=decision.message or "This company is outside the Amazon target.", live_model=False
+            text=decision.message or "This company is outside the Amazon target.", kind="policy"
         )
 
     if not settings.claude_ready:
@@ -53,7 +61,7 @@ def answer_amazon_question(
                 "Claude is not connected yet. Add the Anthropic API key to the local .env file "
                 "and restart InterviewForge. Your question has not been sent anywhere."
             ),
-            live_model=False,
+            kind="offline",
         )
 
     if model_factory is None:
@@ -69,7 +77,7 @@ def answer_amazon_question(
             model_name=model_id,
             api_key=SecretStr(settings.anthropic_api_key.get_secret_value()),
             timeout=30.0,
-            max_retries=1,
+            max_retries=2,
         )
         agent = agent_factory(model=model)
         result = agent.invoke(
@@ -91,13 +99,16 @@ def answer_amazon_question(
         text = _message_text(messages[-1]) if messages else ""
         if not text:
             raise RuntimeError("Claude returned no displayable message")
-    except Exception:
+    except Exception as exc:
+        logger.warning(
+            json.dumps({"event": "claude_invocation_failed", "error_type": type(exc).__name__})
+        )
         return CoachAnswer(
             text=(
                 "Claude could not complete this request. Check the local key, model access, "
                 "network connection, and API balance, then try again."
             ),
-            live_model=False,
+            kind="error",
             model=settings.llm_model,
         )
-    return CoachAnswer(text=text, live_model=True, model=settings.llm_model)
+    return CoachAnswer(text=text, kind="live", model=settings.llm_model)

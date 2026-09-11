@@ -37,6 +37,7 @@ def test_live_coach_invokes_deep_agent_with_claude_model():
     )
 
     assert answer.live_model
+    assert answer.kind == "live"
     assert answer.text == "Amazon coaching response"
     assert captured["model"]["model_name"] == "claude-sonnet-5"
     assert captured["model"]["api_key"].get_secret_value() == "test-secret"
@@ -55,6 +56,7 @@ def test_competitor_request_never_constructs_or_invokes_model():
         agent_factory=forbidden_factory,
     )
     assert not answer.live_model
+    assert answer.kind == "policy"
     assert "current target is Amazon" in answer.text
 
 
@@ -68,5 +70,6 @@ def test_provider_failure_returns_safe_message():
         model_factory=failing_model,
     )
     assert not answer.live_model
+    assert answer.kind == "error"
     assert "test-secret" not in answer.text
     assert "Claude could not complete" in answer.text

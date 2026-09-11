@@ -11,7 +11,7 @@
   <div class="conversation">
     <div class="message coach-message"><span>IF</span><p>Ask me about Amazon interview preparation, leadership principles, coding topics, or how to improve an Amazon-style answer.</p></div>
     {% if question %}<div class="message user-message"><span>You</span><p>{{ question }}</p></div>{% endif %}
-    {% if answer %}<div class="message coach-message"><span>IF</span><div><small class="answer-origin">{{ 'LIVE CLAUDE RESPONSE' if live_model else 'LOCAL POLICY RESPONSE' }}</small><p>{{ answer }}</p></div></div>{% endif %}
+    {% if answer %}<div class="message coach-message"><span>IF</span><div><small class="answer-origin {{ response_kind }}">{% if response_kind == 'live' %}LIVE CLAUDE RESPONSE{% elif response_kind == 'policy' %}AMAZON SCOPE RESPONSE{% elif response_kind == 'error' %}CLAUDE CONNECTION ERROR{% else %}LOCAL SETUP RESPONSE{% endif %}</small><p>{{ answer }}</p></div></div>{% endif %}
   </div>
   <form class="coach-form" method="post" action="/coach">
     <label for="question">Your Amazon preparation question</label>

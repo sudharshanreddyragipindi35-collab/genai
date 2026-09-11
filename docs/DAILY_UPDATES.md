@@ -1,5 +1,15 @@
 # Daily updates
 
+## 2026-09-12 Claude connection diagnosis
+
+Completed:
+
+- Verified the configured key and Claude Sonnet 5 using a direct provider request.
+- Verified the Deep Agents wrapper and complete Amazon Coach service independently.
+- Identified the displayed failure as transient rather than a key, model, account, or integration error.
+- Added accurate live, scope, offline, and connection-error labels plus one additional bounded retry.
+- Added safe diagnostic logging containing only the exception type, never the key or provider message.
+
 ## 2026-09-12 Live Claude invocation
 
 Completed:
