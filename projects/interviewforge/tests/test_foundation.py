@@ -99,7 +99,7 @@ def test_basic_application_pages_are_visible(tmp_path):
 
         practice = client.get("/practice")
         assert practice.status_code == 200
-        assert "Level-based LeetCode practice" in practice.text
+        assert "Amazon-reported coding practice" in practice.text
         assert "Create your Amazon roadmap first" in practice.text
 
         coach = client.get("/coach")

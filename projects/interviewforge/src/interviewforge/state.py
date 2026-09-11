@@ -14,7 +14,12 @@ class RoadmapStore:
     def load(self) -> CandidateRoadmap | None:
         if not self.path.exists():
             return None
-        return CandidateRoadmap.model_validate_json(self.path.read_text(encoding="utf-8"))
+        import json
+
+        data = json.loads(self.path.read_text(encoding="utf-8"))
+        if "curriculum_version" not in data:
+            return None
+        return CandidateRoadmap.model_validate(data)
 
     def save(self, roadmap: CandidateRoadmap) -> None:
         with self._lock:

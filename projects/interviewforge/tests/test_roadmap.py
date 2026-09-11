@@ -4,9 +4,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from interviewforge.ai.leetcode_mcp import parse_problem_result
+from interviewforge.amazon_content import REPORTS
 from interviewforge.app import create_app
 from interviewforge.config import Settings
-from interviewforge.roadmap import build_roadmap, complete_task
+from interviewforge.roadmap import PracticeProblem, apply_mcp_problems, build_roadmap, complete_task
 
 
 def make_roadmap():
@@ -41,6 +42,12 @@ def test_locked_level_cannot_be_completed_early():
 def test_assessment_and_interview_unlock_in_sequence(tmp_path):
     config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
     roadmap = make_roadmap()
+    problem = PracticeProblem(
+        **REPORTS["SDE I"][0],
+        url="https://leetcode.com/problems/intersection-of-two-arrays-ii/",
+        source="leetcode_mcp",
+    )
+    apply_mcp_problems(roadmap, [[problem]])
     config.local_state_path.write_text(roadmap.model_dump_json(), encoding="utf-8")
     with TestClient(create_app(config)) as client:
         assert client.post("/assessment/complete").status_code == 409
@@ -55,22 +62,38 @@ def test_assessment_and_interview_unlock_in_sequence(tmp_path):
 
 
 def test_leetcode_mcp_result_is_converted_to_validated_public_links():
-    result = {"questions": [{"title": "Two Sum", "titleSlug": "two-sum", "difficulty": "EASY"}]}
+    result = {
+        "questions": [
+            {"title": "Two Sum", "titleSlug": "intersection-of-two-arrays-ii", "difficulty": "EASY"}
+        ]
+    }
     problems = parse_problem_result(result)
     assert len(problems) == 1
     assert problems[0].source == "leetcode_mcp"
-    assert problems[0].url == "https://leetcode.com/problems/two-sum/"
+    assert problems[0].url == "https://leetcode.com/problems/intersection-of-two-arrays-ii/"
 
 
 def test_unlocked_problem_has_embedded_contextual_coach(tmp_path):
     config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
-    config.local_state_path.write_text(make_roadmap().model_dump_json(), encoding="utf-8")
+    roadmap = make_roadmap()
+    problem = PracticeProblem(
+        **REPORTS["SDE I"][0],
+        url="https://leetcode.com/problems/intersection-of-two-arrays-ii/",
+        source="leetcode_mcp",
+    )
+    apply_mcp_problems(roadmap, [[problem]])
+    for task in roadmap.levels[0].tasks:
+        complete_task(roadmap, task.id)
+    config.local_state_path.write_text(roadmap.model_dump_json(), encoding="utf-8")
     with TestClient(create_app(config)) as client:
-        page = client.get("/practice?problem=two-sum")
-        assert "Discuss Two Sum" in page.text
+        page = client.get("/practice?problem=intersection-of-two-arrays-ii")
+        assert "Discuss Intersection of Two Arrays II" in page.text
         response = client.post(
             "/practice/coach",
-            data={"problem_slug": "two-sum", "question": "Give me the first hint"},
+            data={
+                "problem_slug": "intersection-of-two-arrays-ii",
+                "question": "Give me the first hint",
+            },
         )
     assert response.status_code == 200
     assert "Give me the first hint" in response.text
@@ -79,7 +102,16 @@ def test_unlocked_problem_has_embedded_contextual_coach(tmp_path):
 
 def test_locked_problem_cannot_be_sent_to_coach(tmp_path):
     config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
-    config.local_state_path.write_text(make_roadmap().model_dump_json(), encoding="utf-8")
+    roadmap = make_roadmap()
+    problem = PracticeProblem(
+        **REPORTS["SDE I"][0],
+        url="https://leetcode.com/problems/intersection-of-two-arrays-ii/",
+        source="leetcode_mcp",
+    )
+    apply_mcp_problems(roadmap, [[problem]])
+    for task in roadmap.levels[0].tasks:
+        complete_task(roadmap, task.id)
+    config.local_state_path.write_text(roadmap.model_dump_json(), encoding="utf-8")
     with TestClient(create_app(config)) as client:
         response = client.post(
             "/practice/coach",

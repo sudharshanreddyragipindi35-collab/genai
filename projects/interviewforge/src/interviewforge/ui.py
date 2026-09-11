@@ -1,18 +1,18 @@
 """Server-rendered candidate application and progress actions."""
 
-import asyncio
 import json
 import logging
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from interviewforge.ai.amazon_client import call_amazon
 from interviewforge.ai.coach import answer_amazon_question
-from interviewforge.ai.leetcode_mcp import search_problems
-from interviewforge.roadmap import apply_mcp_problems, build_roadmap, complete_task
+from interviewforge.roadmap import PracticeProblem, apply_mcp_problems, build_roadmap, complete_task
 from interviewforge.state import RoadmapStore
 
 router = APIRouter(include_in_schema=False)
@@ -61,10 +61,19 @@ def create_candidate_roadmap(
     experience: str = Form(),
     hours_per_day: int = Form(ge=1, le=8),
     target_date: date = Form(),
+    role: Literal["SDE I", "SDE II"] = Form("SDE I"),
+    skill: Literal["beginner", "intermediate", "advanced"] = Form("beginner"),
+    include_genai: bool = Form(False),
 ):
     try:
         roadmap = build_roadmap(
-            name=name, experience=experience, hours_per_day=hours_per_day, target_date=target_date
+            name=name,
+            experience=experience,
+            hours_per_day=hours_per_day,
+            target_date=target_date,
+            role=role,
+            skill=skill,
+            include_genai=include_genai,
         )
     except ValueError as exc:
         return templates.TemplateResponse(
@@ -76,10 +85,10 @@ def create_candidate_roadmap(
     settings = request.app.state.settings
     note = answer_amazon_question(
         settings,
-        f"Create a concise two-sentence preparation priority for an Amazon software engineering candidate with experience '{experience}', {hours_per_day} study hours per day, and a target date of {target_date.isoformat()}. Do not invent current hiring-process facts.",
+        f"Create a concise two-sentence preparation priority for an Amazon software engineering candidate targeting {role} with experience '{experience}', {hours_per_day} study hours per day, and a target date of {target_date.isoformat()}. Do not invent current hiring-process facts.",
     )
     if note.live_model:
-        roadmap.agent_note = note.text
+        roadmap.agent_note += "\n\n" + note.text
         roadmap.agent_note_source = "deep_agent"
     store(request).save(roadmap)
     return RedirectResponse("/roadmap", status_code=303)
@@ -140,7 +149,7 @@ def _practice_page(
             request,
             "practice",
             roadmap=roadmap,
-            leetcode_mcp_configured=bool(request.app.state.settings.leetcode_mcp_server_url),
+            leetcode_mcp_configured=bool(request.app.state.settings.amazon_mcp_server_url),
             selected=selected,
             question=question,
             answer=answer,
@@ -188,24 +197,39 @@ async def sync_practice_problems(request: Request):
     roadmap = store(request).load()
     if roadmap is None:
         return RedirectResponse("/onboarding", status_code=303)
-    if not settings.leetcode_mcp_server_url:
-        raise HTTPException(status_code=409, detail="LeetCode MCP is not configured")
+    if not settings.amazon_mcp_server_url:
+        raise HTTPException(status_code=409, detail="Amazon content MCP is not configured")
     try:
-        problem_groups = await asyncio.gather(
-            *(
-                search_problems(
-                    settings.leetcode_mcp_server_url, settings.leetcode_mcp_tool, difficulty, 3
+        data = await call_amazon(
+            settings.amazon_mcp_server_url,
+            "amazon_reported_coding_questions",
+            {"role": roadmap.role},
+        )
+        if data.get("company") != "amazon" or data.get("role") != roadmap.role:
+            raise ValueError("Wrong company or role")
+        from interviewforge.amazon_content import REPORTS
+
+        registry = {p["slug"]: p for p in REPORTS[roadmap.role]}
+        approved = []
+        for item in data.get("problems", []):
+            if item != registry.get(item.get("slug")):
+                continue
+            if settings.leetcode_mcp_server_url:
+                from interviewforge.ai.leetcode_mcp import get_reported_problem
+
+                await get_reported_problem(settings.leetcode_mcp_server_url, item["slug"])
+            approved.append(
+                PracticeProblem(
+                    **item,
+                    url=f"https://leetcode.com/problems/{item['slug']}/",
+                    source="amazon_mcp",
                 )
-                for difficulty in ("EASY", "MEDIUM", "HARD")
             )
-        )
-        apply_mcp_problems(roadmap, problem_groups)
+        apply_mcp_problems(roadmap, [approved])
     except Exception as exc:
-        logger.warning(
-            json.dumps({"event": "leetcode_mcp_failed", "error_type": type(exc).__name__})
-        )
+        logger.warning(json.dumps({"event": "amazon_mcp_failed", "error_type": type(exc).__name__}))
         roadmap.problem_sync_message = (
-            "LeetCode MCP could not be reached; curated links remain active."
+            "Amazon evidence retrieval failed. No generic questions were added."
         )
     store(request).save(roadmap)
     return RedirectResponse("/practice", status_code=303)
@@ -234,7 +258,7 @@ def assessment_complete(request: Request):
 
 
 @router.get("/coach", response_class=HTMLResponse)
-def coach(request: Request):
+def coach(request: Request, lesson: str | None = None):
     settings = request.app.state.settings
     return templates.TemplateResponse(
         request=request,
@@ -242,7 +266,7 @@ def coach(request: Request):
         context=page_context(
             request,
             "coach",
-            question=None,
+            question=lesson,
             answer=None,
             live_model=False,
             response_kind=None,
@@ -255,7 +279,13 @@ def coach(request: Request):
 @router.post("/coach", response_class=HTMLResponse)
 def ask_coach(request: Request, question: str = Form(min_length=2, max_length=2_000)):
     settings = request.app.state.settings
-    result = answer_amazon_question(settings, question)
+    roadmap = store(request).load()
+    context = (
+        f"Target Amazon {roadmap.role}; experience {roadmap.experience}; current skills {roadmap.skill}; interview {roadmap.target_date}; hours/day {roadmap.hours_per_day}. "
+        if roadmap
+        else ""
+    )
+    result = answer_amazon_question(settings, context + question)
     return templates.TemplateResponse(
         request=request,
         name="coach.html",

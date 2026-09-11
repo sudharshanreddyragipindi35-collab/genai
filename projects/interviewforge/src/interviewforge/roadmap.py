@@ -1,9 +1,11 @@
 """Deterministic Amazon preparation roadmap and unlock rules."""
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from interviewforge.amazon_content import LESSONS, SOURCES
 
 
 class PracticeProblem(BaseModel):
@@ -11,7 +13,10 @@ class PracticeProblem(BaseModel):
     slug: str
     difficulty: Literal["Easy", "Medium", "Hard"]
     url: str
-    source: Literal["curated", "leetcode_mcp"] = "curated"
+    source: Literal["curated", "leetcode_mcp", "amazon_mcp"] = "curated"
+    report_url: str | None = None
+    reported_date: str | None = None
+    match_type: str | None = None
 
 
 class RoadmapTask(BaseModel):
@@ -21,6 +26,10 @@ class RoadmapTask(BaseModel):
     minutes: int
     completed: bool = False
     problem: PracticeProblem | None = None
+    lesson: str = ""
+    exercise: str = ""
+    source_url: str = ""
+    scheduled_date: date | None = None
 
 
 class RoadmapLevel(BaseModel):
@@ -36,6 +45,10 @@ class RoadmapLevel(BaseModel):
 
 class CandidateRoadmap(BaseModel):
     company: Literal["Amazon"] = "Amazon"
+    curriculum_version: int = 2
+    role: Literal["SDE I", "SDE II"] = "SDE I"
+    skill: Literal["beginner", "intermediate", "advanced"] = "beginner"
+    include_genai: bool = False
     language: Literal["Python"] = "Python"
     name: str = Field(min_length=2, max_length=60)
     experience: str
@@ -78,123 +91,86 @@ class CandidateRoadmap(BaseModel):
         return all(level.completed for level in self.levels if level.number < level_number)
 
 
-CURATED_PROBLEMS = (
-    ("Two Sum", "two-sum", "Easy", "array, hash map"),
-    ("Valid Parentheses", "valid-parentheses", "Easy", "stack"),
-    (
-        "Binary Tree Level Order Traversal",
-        "binary-tree-level-order-traversal",
-        "Medium",
-        "tree, BFS",
-    ),
-    ("Number of Islands", "number-of-islands", "Medium", "graph, DFS"),
-    ("LRU Cache", "lru-cache", "Medium", "design"),
-    ("Word Ladder", "word-ladder", "Hard", "graph, BFS"),
-)
-
-
-def _problem(index: int) -> PracticeProblem:
-    title, slug, difficulty, _ = CURATED_PROBLEMS[index]
-    return PracticeProblem(
-        title=title,
-        slug=slug,
-        difficulty=difficulty,
-        url=f"https://leetcode.com/problems/{slug}/",
-    )
-
-
 def build_roadmap(
-    *, name: str, experience: str, hours_per_day: int, target_date: date, today: date | None = None
+    *,
+    name: str,
+    experience: str,
+    hours_per_day: int,
+    target_date: date,
+    today: date | None = None,
+    role: Literal["SDE I", "SDE II"] = "SDE I",
+    skill: Literal["beginner", "intermediate", "advanced"] = "beginner",
+    include_genai: bool = False,
 ) -> CandidateRoadmap:
     today = today or date.today()
     if target_date <= today:
         raise ValueError("Target date must be after today")
     days = (target_date - today).days
-    pace = "compressed" if days < 21 else "steady" if days < 60 else "extended"
-    minutes = min(hours_per_day * 60, 180)
-    levels = [
-        RoadmapLevel(
-            number=1,
-            title="Level 1 · Foundations",
-            objective="Build Python, DSA, and explanation fundamentals.",
-            tasks=[
-                RoadmapTask(
-                    id="l1-concepts",
-                    title="Review complexity, arrays, hash maps, and stacks",
+    # More repetitions for beginners and longer preparation windows.
+    repeats = (2 if skill == "beginner" else 1) + (1 if days >= 45 else 0)
+    levels = []
+    topics = [["coding", "lp"], ["lld", "design"] if role == "SDE II" else ["lld", "lp"], ["mock"]]
+    if include_genai:
+        topics[1].append("genai")
+    for number, keys in enumerate(topics, 1):
+        tasks = []
+        for key in keys:
+            title, source, lesson, exercise = LESSONS[key]
+            for repetition in range(repeats if key in {"coding", "lp"} else 1):
+                suffix = f" ? rehearsal {repetition + 1}" if repetition else ""
+                task = RoadmapTask(
+                    id=f"l{number}-{key}-{repetition}",
+                    title=title + suffix,
                     kind="learn",
-                    minutes=minutes,
-                ),
+                    minutes=45 if skill == "advanced" else 60,
+                    lesson=lesson,
+                    exercise=exercise
+                    + (
+                        " Use a professional project and explain your personal ownership."
+                        if experience != "Student / fresher" and key == "lp"
+                        else ""
+                    ),
+                    source_url=SOURCES[source][1],
+                )
+                tasks.append(task)
+        if number == 2:
+            tasks.append(
                 RoadmapTask(
-                    id="l1-two-sum",
-                    title="Solve Two Sum and explain the trade-offs",
+                    id="l2-amazon-code",
+                    title="Amazon-reported coding practice (sync evidence)",
                     kind="code",
-                    minutes=minutes,
-                    problem=_problem(0),
-                ),
-                RoadmapTask(
-                    id="l1-parentheses",
-                    title="Solve Valid Parentheses without hints",
-                    kind="code",
-                    minutes=minutes,
-                    problem=_problem(1),
-                ),
-            ],
-        ),
-        RoadmapLevel(
-            number=2,
-            title="Level 2 · Problem-solving patterns",
-            objective="Apply tree, graph, recursion, and design patterns.",
-            tasks=[
-                RoadmapTask(
-                    id="l2-tree",
-                    title="Practice breadth-first tree traversal",
-                    kind="code",
-                    minutes=minutes,
-                    problem=_problem(2),
-                ),
-                RoadmapTask(
-                    id="l2-islands",
-                    title="Practice graph traversal and edge cases",
-                    kind="code",
-                    minutes=minutes,
-                    problem=_problem(3),
-                ),
-                RoadmapTask(
-                    id="l2-review",
-                    title="Review solutions with the AI code coach",
-                    kind="review",
-                    minutes=minutes,
-                ),
-            ],
-        ),
-        RoadmapLevel(
-            number=3,
-            title="Level 3 · Interview readiness",
-            objective="Work under time limits and communicate decisions clearly.",
-            tasks=[
-                RoadmapTask(
-                    id="l3-design",
-                    title="Implement and explain an LRU Cache",
-                    kind="code",
-                    minutes=minutes,
-                    problem=_problem(4),
-                ),
-                RoadmapTask(
-                    id="l3-hard",
-                    title="Attempt a timed advanced graph problem",
-                    kind="code",
-                    minutes=minutes,
-                    problem=_problem(5),
-                ),
-                RoadmapTask(
-                    id="l3-mock",
-                    title="Complete a timed coding rehearsal",
-                    kind="review",
-                    minutes=minutes,
-                ),
-            ],
-        ),
-    ]
+                    minutes=60,
+                )
+            )
+        levels.append(
+            RoadmapLevel(
+                number=number,
+                title=[
+                    "Learn concepts and Leadership Principles",
+                    "Apply role-specific skills",
+                    "Rehearse and review",
+                ][number - 1],
+                objective=f"Amazon {role} ? {skill} preparation",
+                tasks=tasks,
+            )
+        )
+    total = sum(t.minutes for level in levels for t in level.tasks)
+    capacity = days * hours_per_day * 60
+    elapsed = 0
+    for level in levels:
+        for task in level.tasks:
+            task.scheduled_date = today + timedelta(
+                days=min(
+                    days - 1,
+                    max(elapsed // (hours_per_day * 60), int(elapsed * days / max(total, 1))),
+                )
+            )
+            elapsed += task.minutes
+    warning = (
+        f" Core work needs {total} minutes; your available {capacity} minutes are insufficient. Extend the date or increase study time."
+        if total > capacity
+        else ""
+    )
     return CandidateRoadmap(
         name=name.strip(),
         experience=experience,
@@ -202,10 +178,11 @@ def build_roadmap(
         hours_per_day=hours_per_day,
         created_on=today,
         levels=levels,
-        agent_note=(
-            f"This is a {pace} plan with {days} days available. Complete each level in order; "
-            "your assessment unlocks after every Level 3 task is complete."
-        ),
+        role=role,
+        skill=skill,
+        include_genai=include_genai,
+        agent_note=f"Amazon {role}: {days} days, {hours_per_day} hours/day. Learn concepts and LP first, then attributed coding practice and rehearsal.{warning}",
+        problem_sync_message="Only Amazon-attributed reports are eligible. Sync the reviewed question registry after learning the foundations.",
     )
 
 
@@ -213,6 +190,10 @@ def complete_task(roadmap: CandidateRoadmap, task_id: str) -> CandidateRoadmap:
     for level in roadmap.levels:
         for task in level.tasks:
             if task.id == task_id:
+                if task.id == "l2-amazon-code":
+                    raise PermissionError(
+                        "Retrieve Amazon-attributed problems before completing coding practice"
+                    )
                 if not roadmap.level_unlocked(level.number):
                     raise PermissionError("Complete the previous level first")
                 task.completed = True
@@ -224,16 +205,28 @@ def apply_mcp_problems(
     roadmap: CandidateRoadmap, problems_by_level: list[list[PracticeProblem]]
 ) -> CandidateRoadmap:
     """Replace coding tasks only with validated problems returned by MCP."""
-    replaced = 0
-    for level, problems in zip(roadmap.levels, problems_by_level, strict=False):
-        coding_tasks = [task for task in level.tasks if task.kind == "code"]
-        for task, problem in zip(coding_tasks, problems, strict=False):
-            task.problem = problem
-            task.title = f"Solve {problem.title} and explain the approach"
-            replaced += 1
-    roadmap.problem_sync_message = (
-        f"Retrieved {replaced} validated problem(s) through LeetCode MCP."
-        if replaced
-        else "LeetCode MCP returned no usable problems; curated links remain active."
-    )
+    eligible = [
+        p
+        for group in problems_by_level
+        for p in group
+        if p.report_url and p.reported_date and p.match_type
+    ]
+    level = roadmap.levels[1]
+    existing = {task.problem.slug for task in level.tasks if task.problem}
+    for problem in eligible:
+        if problem.slug in existing:
+            continue
+        level.tasks.append(
+            RoadmapTask(
+                id=f"amazon-{problem.slug}",
+                title=f"Amazon report: {problem.title}",
+                kind="code",
+                minutes=60,
+                problem=problem,
+            )
+        )
+        existing.add(problem.slug)
+    if eligible:
+        level.tasks = [t for t in level.tasks if t.id != "l2-amazon-code"]
+    roadmap.problem_sync_message = f"{len(eligible)} Amazon-attributed problems retrieved. Report age and role are shown; no generic fallback."
     return roadmap

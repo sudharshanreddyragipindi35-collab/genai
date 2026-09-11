@@ -67,3 +67,20 @@ python ../../scripts/check_repository.py
 Tests do not need a real database or paid model: they use a deliberately unreachable database for the outage case and a controlled engine double for the success/lifecycle case. A live successful PostgreSQL connection and migrations must be verified when database provisioning is added in P1-03.
 
 Dependency changes require editing `pyproject.toml`, running `uv lock`, reviewing the lock diff and repeating verification. Fresh environments use `uv sync --locked` to reject a stale lock. This follows the [uv locking workflow](https://docs.astral.sh/uv/concepts/projects/sync/). Startup resources use [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/) and settings follow [FastAPI configuration guidance](https://fastapi.tiangolo.com/advanced/settings/).
+
+
+## Amazon public knowledge MCP
+
+Start this Python bridge from the InterviewForge project directory in a terminal with outbound network access:
+
+```powershell
+.\.venv\Scripts\python.exe -m interviewforge.ai.amazon_server
+```
+
+It listens on http://127.0.0.1:3001/mcp. Set INTERVIEWFORGE_AMAZON_MCP_SERVER_URL to that URL and restart the application. The bridge is maintained by InterviewForge; Amazon supplies the public source pages, not the MCP server. It requires no candidate login.
+
+The tool search_amazon_company_knowledge reads only the fixed official source registry. The tool amazon_reported_coding_questions serves reviewed community evidence, with source URLs and known report dates. Add evidence to amazon_content.py only after checking the first-person report. Difficulty-only LeetCode search is not part of the application sync path.
+
+Start the existing LeetCode MCP service separately if live problem availability checks are needed. It receives only exact attributed slugs through get_problem. A failed sync never falls back to generic problems.
+
+Old generic plans are retained on disk but do not load as version 2 plans. Creating a new plan replaces the active state; progress is local and self-reported.

@@ -63,3 +63,10 @@ async def search_problems(
             )
     texts = [block.text for block in result.content if getattr(block, "type", None) == "text"]
     return parse_problem_result(json.loads(texts[0])) if texts else []
+
+
+async def get_reported_problem(server_url: str, slug: str) -> None:
+    """Check availability of an attributed problem through LeetCode MCP."""
+    from interviewforge.ai.amazon_client import call_amazon
+
+    await call_amazon(server_url, "get_problem", {"titleSlug": slug})

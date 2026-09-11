@@ -1,5 +1,16 @@
 # Daily updates
 
+## Amazon-specific learning and MCP sources
+
+- Replaced generic coding-first plans with role, skill, experience, date, and time-based learning plans.
+- Added substantive lessons, exercises, official reference links, and lesson-to-coach discussion for coding, LP, LLD, SDE II system design, and optional GenAI.
+- Implemented a Python MCP bridge restricted to official Amazon public preparation pages, with bounded retrieval and a one-hour cache. Live LP and SDE II retrieval verified.
+- Connected coach prompts to retrieved evidence and appended source URLs. Retrieval failure is explicitly disclosed.
+- Replaced random difficulty searches with a reviewed Amazon report registry; LeetCode MCP reads exact attributed problem slugs. Reports retain known date, role and variant attribution. Initial registry is deliberately small (two SDE I problems, one SDE II problem).
+- Retained legacy plan files but require a new role-aware plan rather than relabeling generic questions.
+- Validation: 31 tests and lint pass. Local completion remains self-reported, and the assessment/interview engine is still a prototype.
+
+
 ## 2026-09-12 Embedded coding coach
 
 Completed:

@@ -29,3 +29,12 @@ The current local application supports an Amazon-only candidate journey:
 Roadmap progress is saved to the ignored `.interviewforge/state.json` local-preview file. Production persistence and candidate ownership remain PostgreSQL work.
 
 Public coding problems can be synchronized through a configured Streamable HTTP LeetCode MCP server. Until it is connected, the UI identifies its bundled public links as `curated`; it never represents them as MCP results.
+
+
+## Amazon learning flow
+
+Start at /onboarding. Choose SDE I or SDE II, experience, coding level, interview date, daily hours and optional job-specific GenAI. The first stage contains lessons and exercises before coding practice. SDE II adds system-design depth. Dates and repetition counts adapt to availability and skills.
+
+The owned Python Amazon MCP bridge retrieves official Leadership Principles and interview-preparation pages. Claude receives these sources and cites them. Coding sync uses reviewed Amazon interview reports and checks exact problem slugs through LeetCode MCP. The initial registry has two SDE I questions and one SDE II question; it is historical community evidence, not an official or exhaustive question bank.
+
+See the development guide for both local MCP services. Task completion and assessments remain self-reported prototype checkpoints, not validated hiring-readiness scores.
