@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import Field, SecretStr, ValidationError, field_validator
+from pydantic import AliasChoices, Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
@@ -18,8 +18,21 @@ class Settings(BaseSettings):
     db_connect_timeout: int = Field(default=3, ge=1, le=10)
     llm_provider: Literal["disabled", "anthropic", "openai"] = "disabled"
     llm_model: str | None = None
+    anthropic_api_key: SecretStr | None = Field(
+        default=None,
+        validation_alias=AliasChoices("ANTHROPIC_API_KEY", "INTERVIEWFORGE_ANTHROPIC_API_KEY"),
+    )
     amazon_mcp_server_url: str | None = None
     amazon_mcp_tool: str = "search_amazon_company_knowledge"
+
+    @property
+    def claude_ready(self) -> bool:
+        return bool(
+            self.llm_provider == "anthropic"
+            and self.llm_model
+            and self.anthropic_api_key
+            and self.anthropic_api_key.get_secret_value().strip()
+        )
 
     @field_validator("database_url")
     @classmethod

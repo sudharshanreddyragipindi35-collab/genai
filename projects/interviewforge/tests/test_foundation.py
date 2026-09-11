@@ -122,8 +122,26 @@ def test_amazon_question_stays_local_until_integrations_are_configured():
             "/coach", data={"question": "How do Amazon leadership principles work?"}
         )
     assert response.status_code == 200
-    assert "Amazon MCP knowledge source are configured" in response.text
+    assert "Claude is not connected yet" in response.text
     assert "has not been sent anywhere" in response.text
+
+
+def test_coach_status_never_exposes_key():
+    config = Settings(
+        _env_file=None,
+        llm_provider="anthropic",
+        llm_model="anthropic:claude-sonnet-5",
+        ANTHROPIC_API_KEY="private-claude-key",
+    )
+    with TestClient(create_app(config)) as client:
+        response = client.get("/coach/status")
+    assert response.json() == {
+        "provider": "anthropic",
+        "model": "anthropic:claude-sonnet-5",
+        "configured": True,
+        "amazon_mcp_configured": False,
+    }
+    assert "private-claude-key" not in response.text
 
 
 def test_onboarding_builds_an_explicit_unsaved_preview():

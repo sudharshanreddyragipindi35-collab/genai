@@ -7,15 +7,16 @@
     <div><span class="eyebrow">AMAZON INTERVIEW COACH</span><h1>Ask about your Amazon preparation.</h1><p>Focused on Amazon software-engineering preparation with Python.</p></div>
   </header>
   <div class="scope-note"><strong>Current target: Amazon</strong><span>Questions about other companies are outside this preparation plan.</span></div>
+  <div class="connection-state {{ 'connected' if configured else 'offline' }}"><span></span><strong>{{ 'Claude configured' if configured else 'Claude not configured' }}</strong>{% if model %}<small>{{ model }}</small>{% endif %}</div>
   <div class="conversation">
     <div class="message coach-message"><span>IF</span><p>Ask me about Amazon interview preparation, leadership principles, coding topics, or how to improve an Amazon-style answer.</p></div>
     {% if question %}<div class="message user-message"><span>You</span><p>{{ question }}</p></div>{% endif %}
-    {% if answer %}<div class="message coach-message"><span>IF</span><p>{{ answer }}</p></div>{% endif %}
+    {% if answer %}<div class="message coach-message"><span>IF</span><div><small class="answer-origin">{{ 'LIVE CLAUDE RESPONSE' if live_model else 'LOCAL POLICY RESPONSE' }}</small><p>{{ answer }}</p></div></div>{% endif %}
   </div>
   <form class="coach-form" method="post" action="/coach">
     <label for="question">Your Amazon preparation question</label>
     <div><textarea id="question" name="question" minlength="2" maxlength="2000" required placeholder="How should I structure an Amazon leadership-principle answer?"></textarea><button class="button primary" type="submit">Ask coach →</button></div>
-    <small>The live LLM remains off until you configure your key locally.</small>
+    <small>{{ 'Questions are sent to Anthropic when you submit this form.' if configured else 'The live LLM remains off until you configure your key locally and restart.' }}</small>
   </form>
 </section>
 {% endblock %}

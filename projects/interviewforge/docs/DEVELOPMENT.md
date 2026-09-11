@@ -45,12 +45,15 @@ The basic application starts without a database or key. A local ignored `.env` i
 - `GET /onboarding`: target setup preview; submitted values are explicitly not persisted yet.
 - `GET /practice`: first Python problem experience; code execution is explicitly disabled until the secure runner is implemented.
 - `GET /coach`: Amazon-only coach. Named requests about other companies are refused before any LLM or MCP call.
+- `GET /coach/status`: reports provider, model, configuration readiness and MCP readiness without returning the API key.
 - `GET /health`: 200 while the application is alive, without requiring a database or model.
 - `GET /ready`: performs `SELECT 1`; returns 200 when the database is reachable or 503 when unavailable. This checks connectivity, not migration/schema readiness yet.
 - `/docs` and `/openapi.json`: available outside production for development.
 - Every request receives a server-generated `X-Trace-ID`. Internal errors return a generic response with that ID. Request logs include status, duration and method, excluding request URLs, bodies, database errors and credentials.
 
 No registration, profile, UI or AI endpoints exist yet. Disabling API documentation is not authentication; do not expose this development server as the finished product.
+
+When `configured` is `true` at `/coach/status`, submitting an allowed Amazon question sends the prompt to Anthropic through the Deep Agents supervisor. The UI labels a successful result `LIVE CLAUDE RESPONSE`. Local policy refusals and provider failures are never labeled as successful model output. Until MCP is configured, the runtime prompt limits Claude to general coaching and prevents claims about current Amazon process facts.
 
 ## Verification
 

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from interviewforge.ai.amazon_scope import enforce_amazon_scope
+from interviewforge.ai.coach import answer_amazon_question
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
@@ -66,25 +66,47 @@ def practice(request: Request):
 
 @router.get("/coach", response_class=HTMLResponse)
 def coach(request: Request):
+    settings = request.app.state.settings
     return templates.TemplateResponse(
         request=request,
         name="coach.html",
-        context=page_context(request, "coach", question=None, answer=None),
+        context=page_context(
+            request,
+            "coach",
+            question=None,
+            answer=None,
+            live_model=False,
+            configured=settings.claude_ready,
+            model=settings.llm_model,
+        ),
     )
 
 
 @router.post("/coach", response_class=HTMLResponse)
 def ask_coach(request: Request, question: str = Form(min_length=2, max_length=2_000)):
-    decision = enforce_amazon_scope(question)
-    if decision.allowed:
-        answer = (
-            "I can help with this Amazon preparation question after the LLM key and reviewed "
-            "Amazon MCP knowledge source are configured. Your question has not been sent anywhere."
-        )
-    else:
-        answer = decision.message
+    settings = request.app.state.settings
+    result = answer_amazon_question(settings, question)
     return templates.TemplateResponse(
         request=request,
         name="coach.html",
-        context=page_context(request, "coach", question=question, answer=answer),
+        context=page_context(
+            request,
+            "coach",
+            question=question,
+            answer=result.text,
+            live_model=result.live_model,
+            configured=settings.claude_ready,
+            model=result.model or settings.llm_model,
+        ),
     )
+
+
+@router.get("/coach/status")
+def coach_status(request: Request):
+    settings = request.app.state.settings
+    return {
+        "provider": settings.llm_provider,
+        "model": settings.llm_model,
+        "configured": settings.claude_ready,
+        "amazon_mcp_configured": bool(settings.amazon_mcp_server_url),
+    }

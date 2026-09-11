@@ -53,7 +53,7 @@ SUBAGENTS: list[dict[str, Any]] = [
 ]
 
 
-def create_coach_agent(model: str, tools: Sequence[Callable[..., Any]] = ()) -> Any:
+def create_coach_agent(model: Any, tools: Sequence[Callable[..., Any]] = ()) -> Any:
     """Build the provider-neutral coach with isolated specialist subagents."""
     try:
         from deepagents import create_deep_agent

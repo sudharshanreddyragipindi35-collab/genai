@@ -1,5 +1,17 @@
 # Daily updates
 
+## 2026-09-12 Live Claude invocation
+
+Completed:
+
+- Connected allowed Amazon Coach questions to Claude through the Deep Agents supervisor.
+- Added a key-safe `/coach/status` endpoint and visible configured/offline state.
+- Added explicit `LIVE CLAUDE RESPONSE` and `LOCAL POLICY RESPONSE` labels.
+- Kept non-Amazon requests outside the model invocation path.
+- Added bounded timeouts, limited retries and credential-safe provider errors.
+
+The first real question submitted by the user will be the first Anthropic API call. Current Amazon process claims remain restricted until the reviewed Amazon MCP source is connected.
+
 ## 2026-09-12 Claude configuration
 
 Completed:
