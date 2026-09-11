@@ -62,6 +62,32 @@ def test_leetcode_mcp_result_is_converted_to_validated_public_links():
     assert problems[0].url == "https://leetcode.com/problems/two-sum/"
 
 
+def test_unlocked_problem_has_embedded_contextual_coach(tmp_path):
+    config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
+    config.local_state_path.write_text(make_roadmap().model_dump_json(), encoding="utf-8")
+    with TestClient(create_app(config)) as client:
+        page = client.get("/practice?problem=two-sum")
+        assert "Discuss Two Sum" in page.text
+        response = client.post(
+            "/practice/coach",
+            data={"problem_slug": "two-sum", "question": "Give me the first hint"},
+        )
+    assert response.status_code == 200
+    assert "Give me the first hint" in response.text
+    assert "Claude is not connected yet" in response.text
+
+
+def test_locked_problem_cannot_be_sent_to_coach(tmp_path):
+    config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
+    config.local_state_path.write_text(make_roadmap().model_dump_json(), encoding="utf-8")
+    with TestClient(create_app(config)) as client:
+        response = client.post(
+            "/practice/coach",
+            data={"problem_slug": "number-of-islands", "question": "Explain this"},
+        )
+    assert response.status_code == 404
+
+
 def test_target_date_must_be_in_future():
     with pytest.raises(ValueError, match="after today"):
         build_roadmap(

@@ -1,5 +1,15 @@
 # Daily updates
 
+## 2026-09-12 Embedded coding coach
+
+Completed:
+
+- Embedded a problem-aware chatbot directly in the coding-practice workspace.
+- Added per-problem discussion actions for explanations, progressive hints, complexity analysis, test cases, and Python approach reviews.
+- Restricted the embedded coach to problems in the candidate's saved, currently unlocked roadmap.
+- Diagnosed the displayed Claude error as outbound networking being unavailable to the local server process, before provider authentication.
+
+
 ## 2026-09-12 Amazon roadmap and progression
 
 Completed:

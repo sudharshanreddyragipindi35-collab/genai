@@ -6,7 +6,7 @@ import logging
 from datetime import date
 from pathlib import Path
 
-from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -112,8 +112,26 @@ def mark_task_complete(request: Request, task_id: str):
     return RedirectResponse("/roadmap", status_code=303)
 
 
-@router.get("/practice", response_class=HTMLResponse)
-def practice(request: Request):
+def _selected_problem(roadmap, slug: str | None):
+    if roadmap is None or not slug:
+        return None
+    for level in roadmap.levels:
+        if not roadmap.level_unlocked(level.number):
+            continue
+        for task in level.tasks:
+            if task.problem and task.problem.slug == slug:
+                return task.problem
+    return None
+
+
+def _practice_page(
+    request: Request,
+    *,
+    selected=None,
+    question: str | None = None,
+    answer: str | None = None,
+    response_kind: str | None = None,
+):
     roadmap = store(request).load()
     return templates.TemplateResponse(
         request=request,
@@ -123,7 +141,44 @@ def practice(request: Request):
             "practice",
             roadmap=roadmap,
             leetcode_mcp_configured=bool(request.app.state.settings.leetcode_mcp_server_url),
+            selected=selected,
+            question=question,
+            answer=answer,
+            response_kind=response_kind,
         ),
+    )
+
+
+@router.get("/practice", response_class=HTMLResponse)
+def practice(request: Request, problem: str | None = Query(default=None, max_length=120)):
+    roadmap = store(request).load()
+    return _practice_page(request, selected=_selected_problem(roadmap, problem))
+
+
+@router.post("/practice/coach", response_class=HTMLResponse)
+def practice_coach(
+    request: Request,
+    problem_slug: str = Form(min_length=1, max_length=120),
+    question: str = Form(min_length=2, max_length=2_000),
+):
+    roadmap = store(request).load()
+    selected = _selected_problem(roadmap, problem_slug)
+    if selected is None:
+        raise HTTPException(status_code=404, detail="Unlocked roadmap problem not found")
+    prompt = (
+        f"You are coaching this Amazon-targeted candidate on the public LeetCode problem "
+        f"'{selected.title}' ({selected.difficulty}, slug: {selected.slug}) using Python. "
+        "Answer their question directly. Teach the reasoning, ask a useful follow-up when "
+        "appropriate, and prefer progressive hints before a complete solution unless they "
+        f"explicitly request one. Candidate question: {question}"
+    )
+    result = answer_amazon_question(request.app.state.settings, prompt)
+    return _practice_page(
+        request,
+        selected=selected,
+        question=question,
+        answer=result.text,
+        response_kind=result.kind,
     )
 
 

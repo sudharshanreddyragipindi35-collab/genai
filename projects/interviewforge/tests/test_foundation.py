@@ -89,8 +89,8 @@ def test_production_hides_api_documentation():
         assert client.get("/openapi.json").status_code == 404
 
 
-def test_basic_application_pages_are_visible():
-    config = Settings(_env_file=None)
+def test_basic_application_pages_are_visible(tmp_path):
+    config = Settings(_env_file=None, local_state_path=tmp_path / "state.json")
     with TestClient(create_app(config)) as client:
         dashboard = client.get("/")
         assert dashboard.status_code == 200
