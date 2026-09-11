@@ -282,6 +282,7 @@ dependencies = [
 [package.optional-dependencies]
 agents = [
     { name = "deepagents" },
+    { name = "langchain-anthropic" },
     { name = "langchain-openai" },
     { name = "mcp" },
 ]
@@ -298,6 +299,7 @@ requires-dist = [
     { name = "deepagents", marker = "extra == 'agents'", specifier = ">=0.7,<1" },
     { name = "fastapi", specifier = ">=0.115,<1" },
     { name = "jinja2", specifier = ">=3.1,<4" },
+    { name = "langchain-anthropic", marker = "extra == 'agents'", specifier = ">=1,<2" },
     { name = "langchain-openai", marker = "extra == 'agents'", specifier = ">=1,<2" },
     { name = "mcp", marker = "extra == 'agents'", specifier = ">=2,<3" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },

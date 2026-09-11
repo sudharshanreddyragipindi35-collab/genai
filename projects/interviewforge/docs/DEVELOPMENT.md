@@ -31,13 +31,13 @@ If using the repository-local tool environment created during development, repla
 | `INTERVIEWFORGE_DATABASE_URL` | Required PostgreSQL URL using `postgresql+psycopg`, with host and database |
 | `INTERVIEWFORGE_ENVIRONMENT` | `development` (default), `test` or `production`; production disables OpenAPI/docs routes |
 | `INTERVIEWFORGE_DB_CONNECT_TIMEOUT` | Database connection and pool checkout timeout, integer 1–10 seconds; default 3 |
-| `INTERVIEWFORGE_LLM_PROVIDER` | `disabled` by default; change to `openai` when the key and model are ready |
+| `INTERVIEWFORGE_LLM_PROVIDER` | `anthropic` for the configured Claude integration; `disabled` turns model use off |
 | `INTERVIEWFORGE_LLM_MODEL` | Provider-qualified tool-calling model identifier used by Deep Agents |
-| `OPENAI_API_KEY` | Secret used by the model adapter; keep only in the ignored local `.env` |
+| `ANTHROPIC_API_KEY` | Claude API secret; keep only in the ignored local `.env` |
 | `INTERVIEWFORGE_AMAZON_MCP_SERVER_URL` | MCP server containing reviewed Amazon company knowledge |
 | `INTERVIEWFORGE_AMAZON_MCP_TOOL` | Amazon search tool name exposed by the MCP server |
 
-The basic application starts without a database or key. Copy `.env.example` to `.env`, paste the key only in that local file, set the model and provider, and later add the reviewed Amazon MCP endpoint. Never paste a real key into chat, source code, `.env.example`, commits, screenshots, or logs. This foundation does not provision PostgreSQL or create schema tables. Invalid configuration prevents startup with a field-level error that omits credential values.
+The basic application starts without a database or key. A local ignored `.env` is prepared with `ANTHROPIC_API_KEY=`; paste the Claude key after that equals sign. The example selects `anthropic:claude-sonnet-5`, which can be changed when model availability or cost requires it. Later, add the reviewed Amazon MCP endpoint. Never paste a real key into chat, source code, `.env.example`, commits, screenshots, or logs. This foundation does not provision PostgreSQL or create schema tables. Invalid configuration prevents startup with a field-level error that omits credential values.
 
 ## Endpoint behavior
 

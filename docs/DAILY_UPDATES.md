@@ -1,5 +1,16 @@
 # Daily updates
 
+## 2026-09-12 Claude configuration
+
+Completed:
+
+- Added Anthropic as a supported model provider.
+- Selected the provider-qualified Claude Sonnet 5 model identifier for the local integration.
+- Added a safe Claude-key placeholder to the committed example and created an ignored local `.env` ready for the real key.
+- Made the Anthropic LangChain adapter an explicit optional agent dependency.
+
+The real key must remain only in `projects/interviewforge/.env` and must never be committed.
+
 ## 2026-09-12 Amazon coach boundary
 
 Completed:

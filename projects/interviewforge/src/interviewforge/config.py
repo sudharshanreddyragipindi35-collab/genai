@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     environment: Literal["development", "test", "production"] = "development"
     database_url: SecretStr | None = None
     db_connect_timeout: int = Field(default=3, ge=1, le=10)
-    llm_provider: Literal["disabled", "openai"] = "disabled"
+    llm_provider: Literal["disabled", "anthropic", "openai"] = "disabled"
     llm_model: str | None = None
     amazon_mcp_server_url: str | None = None
     amazon_mcp_tool: str = "search_amazon_company_knowledge"

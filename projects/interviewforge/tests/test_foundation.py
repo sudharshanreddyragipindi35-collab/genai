@@ -27,6 +27,16 @@ def test_application_can_start_without_database_configuration(monkeypatch, tmp_p
         assert client.get("/ready").json()["database"] == "not_configured"
 
 
+def test_claude_provider_configuration_is_supported():
+    config = Settings(
+        _env_file=None,
+        llm_provider="anthropic",
+        llm_model="anthropic:claude-sonnet-5",
+    )
+    assert config.llm_provider == "anthropic"
+    assert config.llm_model == "anthropic:claude-sonnet-5"
+
+
 def test_invalid_configuration_does_not_expose_secret(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("INTERVIEWFORGE_DATABASE_URL", "invalid-super-secret")
