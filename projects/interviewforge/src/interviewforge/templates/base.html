@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}InterviewForge{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='ai.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='coach.css') }}">
 </head>
 <body>
   <div class="app-shell">
@@ -15,7 +15,7 @@
         <a class="nav-item {{ 'active' if active == 'dashboard' }}" href="/"><span>⌂</span> Dashboard</a>
         <a class="nav-item {{ 'active' if active == 'onboarding' }}" href="/onboarding"><span>◎</span> My target</a>
         <a class="nav-item {{ 'active' if active == 'practice' }}" href="/practice"><span>⌘</span> Practice</a>
-        <a class="nav-item {{ 'active' if active == 'ai-system' }}" href="/ai-system"><span>✦</span> AI system</a>
+        <a class="nav-item {{ 'active' if active == 'coach' }}" href="/coach"><span>✦</span> Amazon coach</a>
         <span class="nav-item disabled"><span>◇</span> Assessments <small>Soon</small></span>
         <span class="nav-item disabled"><span>◌</span> Interviews <small>Soon</small></span>
       </nav>

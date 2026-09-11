@@ -16,8 +16,9 @@ def main() -> None:
         metadata = tomllib.load(stream)
     if metadata["project"]["name"] != "genai-interviewforge":
         errors.append("Unexpected project name")
+    ignored_parts = {".git", ".venv", ".tools", ".uv-cache", "site-packages"}
     for document in root.rglob("*.md"):
-        if ".git" in document.parts:
+        if ignored_parts.intersection(document.parts):
             continue
         for link in re.findall(r"\[[^\]]*\]\(([^)]+)\)", document.read_text(encoding="utf-8")):
             if "://" in link or link.startswith("#"):

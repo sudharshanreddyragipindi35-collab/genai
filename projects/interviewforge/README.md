@@ -2,7 +2,7 @@
 
 InterviewForge is a planned AI-powered interview preparation product with persistent candidate progress, source-grounded company guidance, adaptive Python practice and hiring-journey simulations.
 
-**Status: basic Phase 1 application preview implemented; not a working MVP.** See the [development guide](docs/DEVELOPMENT.md) to run it.
+**Status: basic Phase 1 application preview with an Amazon-only coach shell; not a working MVP.** See the [development guide](docs/DEVELOPMENT.md) to run it.
 
 ## Delivery order
 
@@ -17,4 +17,4 @@ InterviewForge is a planned AI-powered interview preparation product with persis
 
 The application starts with one company target and Python coding. Multi-company expansion, other coding languages, deep system-design workspace, billing, mobile apps and specialist model training are deferred.
 
-See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). `src/interviewforge` now contains API startup, typed configuration, health/readiness checks, request logging, and the Deep Agents integration foundation. Authentication and persisted preparation features are next.
+See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). The Amazon-only boundary is enforced before model invocation and in the MCP knowledge adapter. Authentication, persisted preparation features, a real reviewed Amazon MCP source, and live LLM invocation are next.

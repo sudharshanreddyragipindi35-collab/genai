@@ -6,7 +6,7 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from interviewforge.ai import AGENT_TEAM, AI_CAPABILITIES
+from interviewforge.ai.amazon_scope import enforce_amazon_scope
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
@@ -64,15 +64,27 @@ def practice(request: Request):
     )
 
 
-@router.get("/ai-system", response_class=HTMLResponse)
-def ai_system(request: Request):
+@router.get("/coach", response_class=HTMLResponse)
+def coach(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="ai_system.html",
-        context=page_context(
-            request,
-            "ai-system",
-            agents=AGENT_TEAM,
-            capabilities=AI_CAPABILITIES,
-        ),
+        name="coach.html",
+        context=page_context(request, "coach", question=None, answer=None),
+    )
+
+
+@router.post("/coach", response_class=HTMLResponse)
+def ask_coach(request: Request, question: str = Form(min_length=2, max_length=2_000)):
+    decision = enforce_amazon_scope(question)
+    if decision.allowed:
+        answer = (
+            "I can help with this Amazon preparation question after the LLM key and reviewed "
+            "Amazon MCP knowledge source are configured. Your question has not been sent anywhere."
+        )
+    else:
+        answer = decision.message
+    return templates.TemplateResponse(
+        request=request,
+        name="coach.html",
+        context=page_context(request, "coach", question=question, answer=answer),
     )

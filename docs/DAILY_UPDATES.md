@@ -1,5 +1,17 @@
 # Daily updates
 
+## 2026-09-12 Amazon coach boundary
+
+Completed:
+
+- Removed the implementation-architecture screen from candidate navigation.
+- Added an Amazon Interview Coach as the user-facing AI experience.
+- Added deterministic refusal for named non-Amazon companies before any LLM or MCP request.
+- Added an MCP adapter that always requests Amazon data and rejects results labeled for another company.
+- Added safe placeholders for the provider, model, local API key, MCP server and MCP tool.
+
+Verification: all 15 tests passed. Amazon questions remain local until integrations are configured; Microsoft and other named-company questions receive the Amazon-only response without reaching an LLM. The MCP adapter hard-codes Amazon and rejects cross-company results.
+
 ## 2026-09-11 Agentic AI direction
 
 Completed:

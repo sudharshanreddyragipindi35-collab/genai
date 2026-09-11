@@ -92,11 +92,28 @@ def test_basic_application_pages_are_visible():
         assert "Two Sum" in practice.text
         assert "Code runner comes in Phase 2" in practice.text
 
-        ai_system = client.get("/ai-system")
-        assert ai_system.status_code == 200
-        assert "Deep agent roles" in ai_system.text
-        assert "Hybrid RAG" in ai_system.text
-        assert "AI advises; verified systems decide" in ai_system.text
+        coach = client.get("/coach")
+        assert coach.status_code == 200
+        assert "AMAZON INTERVIEW COACH" in coach.text
+        assert "Current target: Amazon" in coach.text
+
+
+def test_coach_rejects_other_company_before_llm_call():
+    with TestClient(create_app(Settings(_env_file=None))) as client:
+        response = client.post("/coach", data={"question": "Explain Microsoft interviews"})
+    assert response.status_code == 200
+    assert "current target is Amazon" in response.text
+    assert "cannot answer questions about Microsoft" in response.text
+
+
+def test_amazon_question_stays_local_until_integrations_are_configured():
+    with TestClient(create_app(Settings(_env_file=None))) as client:
+        response = client.post(
+            "/coach", data={"question": "How do Amazon leadership principles work?"}
+        )
+    assert response.status_code == 200
+    assert "Amazon MCP knowledge source are configured" in response.text
+    assert "has not been sent anywhere" in response.text
 
 
 def test_onboarding_builds_an_explicit_unsaved_preview():

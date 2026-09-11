@@ -6,6 +6,8 @@ InterviewForge will use the Python Deep Agents SDK on the LangGraph runtime for 
 
 The initial supervisor coordinates a knowledge verifier, learning strategist, code reviewer and evaluation critic. A dedicated interview conductor is added in Phase 4. Each specialist receives the smallest context and tool set needed for its task. Agent tools return typed, bounded results and enforce candidate ownership before data reaches a model.
 
+These concepts are internal implementation details. The candidate product exposes an Amazon coach and evidence-backed preparation features, not an architecture showcase.
+
 ## Generation path
 
 1. Classify mode and enforce authorization and assessment restrictions.
@@ -44,5 +46,7 @@ Production traces redact unnecessary candidate data. Evaluation datasets require
 ## Boundaries
 
 Agents never execute candidate code in the API process, read hidden tests, modify scores, unlock interview stages, publish company content or bypass authorization. Deep Agents filesystem and execution tools are not exposed to candidate-facing agents without an isolated backend and explicit permission policy. Retrieved instructions remain untrusted data.
+
+The Amazon boundary is enforced three times: a deterministic input guard rejects named non-Amazon requests before generation; the MCP adapter hard-codes `company=amazon`; and returned structured MCP data is rejected unless its company is Amazon. The supervisor prompt repeats the restriction as defense in depth.
 
 The integration is optional during the local UI preview. Install it with `uv sync --extra agents --locked` when beginning real model integration. Building the factory does not call a model; invocation requires a configured provider key and tool-calling model.

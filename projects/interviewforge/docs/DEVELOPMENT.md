@@ -20,7 +20,7 @@ To install the agent runtime when developing LLM workflows:
 uv sync --extra agents --locked
 ```
 
-This installs the locked Deep Agents, LangGraph, LangChain, and OpenAI model adapter packages. It does not make a model call or require an API key until an agent is invoked.
+This installs the locked Deep Agents, LangGraph, LangChain, MCP SDK, and OpenAI model adapter packages. It does not make a model call or require an API key until an agent is invoked.
 
 If using the repository-local tool environment created during development, replace `uv` with `../../.tools/Scripts/uv.exe`. The tool environment is ignored and is not required in another checkout.
 
@@ -31,15 +31,20 @@ If using the repository-local tool environment created during development, repla
 | `INTERVIEWFORGE_DATABASE_URL` | Required PostgreSQL URL using `postgresql+psycopg`, with host and database |
 | `INTERVIEWFORGE_ENVIRONMENT` | `development` (default), `test` or `production`; production disables OpenAPI/docs routes |
 | `INTERVIEWFORGE_DB_CONNECT_TIMEOUT` | Database connection and pool checkout timeout, integer 1–10 seconds; default 3 |
+| `INTERVIEWFORGE_LLM_PROVIDER` | `disabled` by default; change to `openai` when the key and model are ready |
+| `INTERVIEWFORGE_LLM_MODEL` | Provider-qualified tool-calling model identifier used by Deep Agents |
+| `OPENAI_API_KEY` | Secret used by the model adapter; keep only in the ignored local `.env` |
+| `INTERVIEWFORGE_AMAZON_MCP_SERVER_URL` | MCP server containing reviewed Amazon company knowledge |
+| `INTERVIEWFORGE_AMAZON_MCP_TOOL` | Amazon search tool name exposed by the MCP server |
 
-The basic application starts without a database so it can be reviewed immediately. Copy `.env.example` to `.env` and uncomment the database setting after PostgreSQL is configured. This foundation does not provision PostgreSQL or create schema tables. Invalid configuration prevents startup with a field-level error that omits credential values. Keep `.env` out of commits.
+The basic application starts without a database or key. Copy `.env.example` to `.env`, paste the key only in that local file, set the model and provider, and later add the reviewed Amazon MCP endpoint. Never paste a real key into chat, source code, `.env.example`, commits, screenshots, or logs. This foundation does not provision PostgreSQL or create schema tables. Invalid configuration prevents startup with a field-level error that omits credential values.
 
 ## Endpoint behavior
 
 - `GET /`: visible candidate dashboard and application navigation.
 - `GET /onboarding`: target setup preview; submitted values are explicitly not persisted yet.
 - `GET /practice`: first Python problem experience; code execution is explicitly disabled until the secure runner is implemented.
-- `GET /ai-system`: reviewable map of the Deep Agents roles and GenAI/ML capability layers.
+- `GET /coach`: Amazon-only coach. Named requests about other companies are refused before any LLM or MCP call.
 - `GET /health`: 200 while the application is alive, without requiring a database or model.
 - `GET /ready`: performs `SELECT 1`; returns 200 when the database is reachable or 503 when unavailable. This checks connectivity, not migration/schema readiness yet.
 - `/docs` and `/openapi.json`: available outside production for development.

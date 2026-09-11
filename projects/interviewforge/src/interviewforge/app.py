@@ -47,6 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
         openapi_url="/openapi.json" if config.environment != "production" else None,
     )
+    app.state.settings = config
     package_dir = Path(__file__).resolve().parent
     app.mount("/static", StaticFiles(directory=package_dir / "static"), name="static")
     app.include_router(ui_router)
