@@ -1,5 +1,13 @@
 # Daily updates
 
+## Structured Amazon system prompts
+- Added a versioned prompt module for scope, evidence, personalization, response modes, teaching formats, source visibility, delegation, and final quality checks.
+- Defined specialist tasks, evidence boundaries, and return formats.
+- Separated retrieved evidence and candidate requests in a structured request envelope.
+- Preserved self-contained explanations, hint-only behavior, and sources on request.
+- Validation: coach invocation and agent factory tests pass (5 tests); lint passes.
+
+
 ## Self-contained learning workspace
 
 - Fixed empty practice levels by opening the first available learning task automatically.
