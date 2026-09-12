@@ -15,6 +15,7 @@ from interviewforge.ai.coach import answer_amazon_question
 from interviewforge.formatting import render_answer
 from interviewforge.roadmap import PracticeProblem, apply_mcp_problems, build_roadmap, complete_task
 from interviewforge.state import RoadmapStore
+from interviewforge.study_content import study_text
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
@@ -139,11 +140,28 @@ def _practice_page(
     request: Request,
     *,
     selected=None,
+    task_id=None,
     question: str | None = None,
     answer: str | None = None,
     response_kind: str | None = None,
 ):
     roadmap = store(request).load()
+    available = (
+        [
+            t
+            for level in roadmap.levels
+            if roadmap.level_unlocked(level.number)
+            for t in level.tasks
+            if t.lesson or t.problem
+        ]
+        if roadmap
+        else []
+    )
+    active_task = next(
+        (t for t in available if t.id == task_id or (selected and t.problem == selected)), None
+    )
+    if active_task is None and available:
+        active_task = next((t for t in available if not t.completed), available[0])
     return templates.TemplateResponse(
         request=request,
         name="practice.html",
@@ -153,6 +171,8 @@ def _practice_page(
             roadmap=roadmap,
             leetcode_mcp_configured=bool(request.app.state.settings.amazon_mcp_server_url),
             selected=selected,
+            active_task=active_task,
+            study_content=study_text(active_task) if active_task else "",
             question=question,
             answer=answer,
             response_kind=response_kind,
@@ -161,9 +181,13 @@ def _practice_page(
 
 
 @router.get("/practice", response_class=HTMLResponse)
-def practice(request: Request, problem: str | None = Query(default=None, max_length=120)):
+def practice(
+    request: Request,
+    problem: str | None = Query(default=None, max_length=120),
+    task: str | None = Query(default=None, max_length=120),
+):
     roadmap = store(request).load()
-    return _practice_page(request, selected=_selected_problem(roadmap, problem))
+    return _practice_page(request, selected=_selected_problem(roadmap, problem), task_id=task)
 
 
 @router.post("/practice/coach", response_class=HTMLResponse)
@@ -326,4 +350,26 @@ def knowledge_page(request: Request):
         context=page_context(
             request, "knowledge", knowledge=knowledge_status(request.app.state.settings)
         ),
+    )
+
+
+@router.post("/practice/lesson-coach", response_class=HTMLResponse)
+def lesson_coach(
+    request: Request,
+    task_id: str = Form(max_length=120),
+    question: str = Form(min_length=2, max_length=2000),
+):
+    roadmap = store(request).load()
+    available = (
+        [t for level in roadmap.levels if roadmap.level_unlocked(level.number) for t in level.tasks]
+        if roadmap
+        else []
+    )
+    task = next((t for t in available if t.id == task_id and (t.lesson or t.problem)), None)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Available lesson not found")
+    prompt = f"Target: Amazon {roadmap.role}. Experience: {roadmap.experience}. Skills: {roadmap.skill}. Teach this lesson inside the application; do not redirect to external sites. Use practical examples and a dry run when helpful. Lesson: {task.title}\n{study_text(task)}\nCandidate question: {question}"
+    result = answer_amazon_question(request.app.state.settings, prompt)
+    return _practice_page(
+        request, task_id=task.id, question=question, answer=result.text, response_kind=result.kind
     )

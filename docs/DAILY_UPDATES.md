@@ -1,5 +1,14 @@
 # Daily updates
 
+## Self-contained learning workspace
+
+- Fixed empty practice levels by opening the first available learning task automatically.
+- Added original in-app lessons for coding, LP/STAR, LLD/cache design, system design, optional GenAI, and rehearsal.
+- Included concrete examples, dry-run tables, Python reference implementations, complexity, trade-offs, and exercises.
+- Replaced external study links with internal lesson navigation and added a task-aware embedded coach.
+- Verified existing 36 tests plus a new unsynced-page test covering rendered lessons, absence of external links, and locked-task enforcement.
+
+
 ## Source visibility preference
 
 - Removed the automatically appended source list from both chat experiences.
