@@ -17,11 +17,11 @@
 {% for level in roadmap.levels %}
 {% set unlocked = roadmap.level_unlocked(level.number) %}
 {% set done = level.tasks | selectattr('completed') | list | length %}
-<details class="panel stage-card {{ 'stage-complete' if level.completed else ('stage-active' if unlocked else 'stage-locked') }}" {% if unlocked and not level.completed %}open{% endif %}>
+<details class="panel stage-card {{ 'stage-complete' if level.completed else ('stage-active' if unlocked else 'stage-locked') }}" >
   <summary>
     <div class="stage-top"><span class="stage-number">{{ '&#10003;' | safe if level.completed else level.number }}</span><span class="time-pill">{{ 'Complete' if level.completed else ('In progress' if unlocked else 'Locked') }}</span></div>
     <h2>{{ level.title }}</h2>
-    <div class="stage-count"><span>{{ done }} / {{ level.tasks | length }} tasks</span><span class="expand-label">View tasks &#9662;</span></div>
+    <div class="stage-count"><span>{{ done }} / {{ level.tasks | length }} tasks</span><span class="expand-label">Expand &#9662;</span></div>
     <progress class="journey-progress" value="{{ done }}" max="{{ level.tasks | length }}" aria-label="Stage {{ level.number }} completion">{{ done }} complete</progress>
   </summary>
   <div class="stage-tasks">

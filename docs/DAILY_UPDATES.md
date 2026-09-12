@@ -1,5 +1,14 @@
 # Daily updates
 
+## Collapsible roadmap and on-demand depth
+- Moved roadmap styles to a dedicated stylesheet and versioned CSS URLs to avoid stale browser assets.
+- Stages start collapsed and expand into concise task lists.
+- Added a More detail action at the end of each available lesson.
+- Deep generation uses role, experience, skills, interview date, days remaining, and daily study time; successful content is saved per task.
+- Opening a lesson does not generate content; repeat requests reuse the saved lesson. Locked tasks remain inaccessible.
+- Validation: 38 tests pass. Live HTTP checks confirm the versioned roadmap stylesheet is served.
+
+
 ## Horizontal roadmap
 - Replaced long stacked stages with compact horizontal expandable stage cards.
 - Added stage completion counts, progress bars, clickable lessons, and completion actions.

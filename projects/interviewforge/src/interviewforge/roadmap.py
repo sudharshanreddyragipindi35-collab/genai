@@ -26,6 +26,7 @@ class RoadmapTask(BaseModel):
     minutes: int
     completed: bool = False
     problem: PracticeProblem | None = None
+    detailed_content: str = ""
     lesson: str = ""
     exercise: str = ""
     source_url: str = ""

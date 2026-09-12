@@ -22,7 +22,11 @@
 {% if active_task %}
 <span class="eyebrow">CURRENT LESSON</span><h2>{{ active_task.title }}</h2>
 <p>Worked learning example. Complete it here and explain the reasoning in your own words.</p>
-<div class="answer-body">{{ study_content | answer_markdown }}</div>
+<div id="lesson-content" class="answer-body">{{ study_content | answer_markdown }}</div>
+{% if not active_task.detailed_content %}
+<section class="lesson-more"><div><strong>Want to go deeper?</strong><p>Generate examples and follow-up questions for your {{ roadmap.role }} target, experience, and interview date.</p></div>
+<form method="post" action="/practice/more"><input type="hidden" name="task_id" value="{{ active_task.id }}"><button class="button primary" type="submit" onclick="this.textContent='Generating...';this.setAttribute('aria-busy','true')">More detail</button></form></section>
+{% else %}<p class="depth-badge">Personalized deep lesson saved for your current plan.</p>{% endif %}
 {% if not active_task.completed %}<form method="post" action="/roadmap/tasks/{{ active_task.id }}/complete" style="margin-top:20px"><button class="button primary">I have studied and practiced this lesson</button></form>{% else %}<p>Lesson marked complete. You can revisit it at any time.</p>{% endif %}
 {% else %}<h2>Your learning plan is ready</h2><p>Open your roadmap to choose the next lesson.</p><a href="/roadmap">Open roadmap</a>{% endif %}
 </section>

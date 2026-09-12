@@ -3,6 +3,7 @@
 import json
 import logging
 from datetime import date
+from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
@@ -20,6 +21,10 @@ from interviewforge.study_content import study_text
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=Path(__file__).resolve().parent / "templates")
 templates.env.filters["answer_markdown"] = render_answer
+templates.env.globals["asset_version"] = sha256(
+    b"".join(p.read_bytes() for p in sorted((Path(__file__).parent / "static").glob("*.css")))
+).hexdigest()[:12]
+
 logger = logging.getLogger("interviewforge.mcp")
 
 
@@ -172,7 +177,9 @@ def _practice_page(
             leetcode_mcp_configured=bool(request.app.state.settings.amazon_mcp_server_url),
             selected=selected,
             active_task=active_task,
-            study_content=study_text(active_task) if active_task else "",
+            study_content=(active_task.detailed_content or study_text(active_task))
+            if active_task
+            else "",
             question=question,
             answer=answer,
             response_kind=response_kind,
@@ -368,8 +375,64 @@ def lesson_coach(
     task = next((t for t in available if t.id == task_id and (t.lesson or t.problem)), None)
     if task is None:
         raise HTTPException(status_code=404, detail="Available lesson not found")
-    prompt = f"Target: Amazon {roadmap.role}. Experience: {roadmap.experience}. Skills: {roadmap.skill}. Teach this lesson inside the application; do not redirect to external sites. Use practical examples and a dry run when helpful. Lesson: {task.title}\n{study_text(task)}\nCandidate question: {question}"
+    prompt = f"Target: Amazon {roadmap.role}. Experience: {roadmap.experience}. Skills: {roadmap.skill}. Interview date: {roadmap.target_date}; days remaining: {roadmap.days_remaining}; hours per day: {roadmap.hours_per_day}. Teach this lesson inside the application; do not redirect to external sites. Use practical examples and a dry run when helpful. Lesson: {task.title}\n{study_text(task)}\nCandidate question: {question}"
     result = answer_amazon_question(request.app.state.settings, prompt)
     return _practice_page(
         request, task_id=task.id, question=question, answer=result.text, response_kind=result.kind
+    )
+
+
+@router.post("/practice/more", response_class=HTMLResponse)
+def expand_lesson(request: Request, task_id: str = Form(max_length=120)):
+    roadmap = store(request).load()
+    if roadmap is None:
+        return RedirectResponse("/onboarding", status_code=303)
+    task = next(
+        (
+            task
+            for level in roadmap.levels
+            if roadmap.level_unlocked(level.number)
+            for task in level.tasks
+            if task.id == task_id and (task.lesson or task.problem)
+        ),
+        None,
+    )
+    if task is None:
+        raise HTTPException(status_code=404, detail="Available lesson not found")
+    if task.detailed_content:
+        return RedirectResponse(f"/practice?task={task.id}#lesson-content", status_code=303)
+    prompt = (
+        f"Generate a deeper self-contained lesson for Amazon {roadmap.role}. "
+        f"Experience: {roadmap.experience}; skills: {roadmap.skill}; "
+        f"interview: {roadmap.target_date}; {roadmap.days_remaining} days remaining; "
+        f"{roadmap.hours_per_day} hours/day. Topic: {task.title}. "
+        "The learner explicitly clicked More detail. Build on the base lesson rather than "
+        "repeating it. Use structured sections: intuition, realistic worked example, step-by-step "
+        "dry run, implementation or STAR/design breakdown as appropriate, common mistakes, "
+        "role-specific follow-up questions, and a short exercise with a solution in a final section. "
+        "Include full Python when relevant. Distinguish must-learn material from optional depth "
+        "given the deadline. Do not include external links. Label illustrative examples. "
+        f"Base lesson:\n{study_text(task)}"
+    )
+    result = answer_amazon_question(request.app.state.settings, prompt)
+    if result.live_model:
+        # Reload so a concurrently completed task is not reverted.
+        current = store(request).load()
+        if current and current.model_dump(exclude={"levels"}) == roadmap.model_dump(
+            exclude={"levels"}
+        ):
+            saved_task = next(
+                (t for level in current.levels for t in level.tasks if t.id == task.id), None
+            )
+            if saved_task:
+                saved_task.detailed_content = result.text
+                store(request).save(current)
+                return RedirectResponse(f"/practice?task={task.id}#lesson-content", status_code=303)
+        raise HTTPException(status_code=409, detail="Your plan changed. Please reopen the lesson.")
+    return _practice_page(
+        request,
+        task_id=task.id,
+        question="More detail",
+        answer=result.text,
+        response_kind=result.kind,
     )
