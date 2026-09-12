@@ -1,5 +1,13 @@
 # Daily updates
 
+## Horizontal roadmap
+- Replaced long stacked stages with compact horizontal expandable stage cards.
+- Added stage completion counts, progress bars, clickable lessons, and completion actions.
+- Collapsed preparation advice and kept locked stages readable without enabling their tasks.
+- Added horizontal scrolling for smaller screens and keyboard-accessible stage summaries.
+- Validation: all 7 roadmap tests pass.
+
+
 ## Structured Amazon system prompts
 - Added a versioned prompt module for scope, evidence, personalization, response modes, teaching formats, source visibility, delegation, and final quality checks.
 - Defined specialist tasks, evidence boundaries, and return formats.
