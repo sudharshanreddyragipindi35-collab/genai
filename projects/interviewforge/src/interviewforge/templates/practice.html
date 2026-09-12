@@ -5,28 +5,24 @@
 {% if not roadmap %}
 <section class="panel empty-state"><h2>Create your Amazon roadmap first</h2><p>Choose your role, experience and interview date to begin.</p><a class="button primary" href="/onboarding">Create learning plan</a></section>
 {% else %}
-<details class="panel side-card"><summary>Your learning path: Amazon {{ roadmap.role }}</summary>
-{% for level in roadmap.levels %}
-<section><h3>{{ level.number }}. {{ level.title }}</h3><p>{{ 'Available' if roadmap.level_unlocked(level.number) else 'Complete the preceding level to unlock' }}</p>
-{% for task in level.tasks %}
-{% if task.lesson or task.problem %}
-<p>{% if roadmap.level_unlocked(level.number) %}<a href="/practice?task={{ task.id }}">{{ task.title }}</a>{% else %}{{ task.title }}{% endif %} {% if task.completed %} - Complete{% endif %}</p>
-{% elif task.id == 'l2-amazon-code' %}
-<p>Reported coding exercises are available after the fundamentals.</p>
-<form method="post" action="/practice/sync"><button class="button outline">Load Amazon practice exercises</button></form>
-{% endif %}
-{% endfor %}</section>{% endfor %}
-</details>
+<form class="panel lesson-picker" method="get" action="/practice">
+<label for="lesson-select">Amazon {{ roadmap.role }} &middot; Choose a lesson</label>
+<div><select id="lesson-select" name="task">
+{% for level in roadmap.levels %}<optgroup label="{{ level.number }}. {{ level.title }}{{ ' (Locked)' if not roadmap.level_unlocked(level.number) }}">
+{% for task in level.tasks if task.lesson or task.problem %}<option value="{{ task.id }}" {% if active_task and task.id == active_task.id %}selected{% endif %} {% if not roadmap.level_unlocked(level.number) %}disabled{% endif %}>{{ task.title | replace(' ? ', ' - ') }}{{ ' (Complete)' if task.completed }}</option>{% endfor %}
+</optgroup>{% endfor %}</select><button class="button outline">Open lesson</button><a href="/roadmap">View roadmap</a></div>
+</form>
+{% for level in roadmap.levels if roadmap.level_unlocked(level.number) %}{% for task in level.tasks if task.id == 'l2-amazon-code' %}<form method="post" action="/practice/sync"><button class="button outline" style="margin-top:12px">Load Amazon practice exercises</button></form>{% endfor %}{% endfor %}
 <div class="practice-workspace" style="margin-top:20px">
 <section class="panel roadmap-level">
 {% if active_task %}
 <span class="eyebrow">CURRENT LESSON</span><h2>{{ active_task.title }}</h2>
 <p>Worked learning example. Complete it here and explain the reasoning in your own words.</p>
 <div id="lesson-content" class="answer-body">{{ study_content | answer_markdown }}</div>
-{% if not active_task.detailed_content %}
-<section class="lesson-more"><div><strong>Want to go deeper?</strong><p>Generate examples and follow-up questions for your {{ roadmap.role }} target, experience, and interview date.</p></div>
-<form method="post" action="/practice/more"><input type="hidden" name="task_id" value="{{ active_task.id }}"><button class="button primary" type="submit" onclick="this.textContent='Generating...';this.setAttribute('aria-busy','true')">More detail</button></form></section>
-{% else %}<p class="depth-badge">Personalized deep lesson saved for your current plan.</p>{% endif %}
+<section class="lesson-more" id="more-panel" {% if active_task.detailed_content %}hidden{% endif %}><div><strong>Want to go deeper?</strong><p>Generate examples for your {{ roadmap.role }} target, experience, and interview date.</p>
+<p id="more-status" role="status" aria-live="polite">{{ more_error or '' }}</p></div>
+<form id="more-form" method="post" action="/practice/more"><input type="hidden" name="task_id" value="{{ active_task.id }}"><button class="button primary" type="submit">More detail</button></form></section>
+<section id="deep-content" {% if not active_task.detailed_content %}hidden{% endif %}><h2>Your personalized deep lesson</h2><p class="depth-badge">Saved for this learning plan.</p><div class="answer-body" id="deep-answer">{{ active_task.detailed_content | answer_markdown }}</div></section>
 {% if not active_task.completed %}<form method="post" action="/roadmap/tasks/{{ active_task.id }}/complete" style="margin-top:20px"><button class="button primary">I have studied and practiced this lesson</button></form>{% else %}<p>Lesson marked complete. You can revisit it at any time.</p>{% endif %}
 {% else %}<h2>Your learning plan is ready</h2><p>Open your roadmap to choose the next lesson.</p><a href="/roadmap">Open roadmap</a>{% endif %}
 </section>
@@ -36,4 +32,43 @@
 {% if answer %}<div class="mini-message"><strong>{{ 'Claude' if response_kind == 'live' else 'Coach status' }}</strong><div class="answer-body">{{ answer | answer_markdown }}</div></div>{% endif %}
 <form method="post" action="/practice/lesson-coach"><input type="hidden" name="task_id" value="{{ active_task.id }}"><label>Your question<textarea name="question" minlength="2" maxlength="2000" required placeholder="Explain the dry run one step at a time."></textarea></label><button class="button primary">Ask coach</button></form>
 {% endif %}</aside></div>
-{% endif %}{% endblock %}
+{% endif %}
+<script>
+const moreForm = document.getElementById("more-form");
+if (moreForm) {
+  moreForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = moreForm.querySelector("button");
+    if (button.disabled) return;
+    const status = document.getElementById("more-status");
+    button.disabled = true;
+    button.textContent = "Generating...";
+    moreForm.setAttribute("aria-busy", "true");
+    status.textContent = "Preparing your detailed lesson. This may take a minute.";
+    try {
+      const response = await fetch(moreForm.action, {
+        method: "POST", body: new FormData(moreForm),
+        headers: {Accept: "application/json"}
+      });
+      const data = await response.json();
+      if (!response.ok || !data.html) {
+        throw new Error(typeof data.detail === "string" ? data.detail : "Unable to generate the lesson. Please try again.");
+      }
+      // HTML is produced by the server's Markdown renderer with raw HTML disabled.
+      document.getElementById("deep-answer").innerHTML = data.html;
+      const section = document.getElementById("deep-content");
+      section.hidden = false;
+      document.getElementById("more-panel").hidden = true;
+      section.scrollIntoView({behavior: "smooth", block: "start"});
+    } catch (error) {
+      status.textContent = error.message || "Connection lost. Please try again.";
+      button.textContent = "Retry more detail";
+    } finally {
+      button.disabled = false;
+      moreForm.removeAttribute("aria-busy");
+    }
+  });
+}
+
+</script>
+{% endblock %}

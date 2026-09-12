@@ -1,5 +1,14 @@
 # Daily updates
 
+## More detail inline results and lesson selector
+- Changed More detail to an inline request with a visible loading state and retry errors beside the button.
+- Kept the original lesson and displayed saved generated material in a separate deep-lesson section.
+- Replaced the duplicate expanded learning-path list with a compact lesson selector and roadmap link.
+- Added JSON success/failure coverage, saved-result rendering, and preservation of base content.
+- Live diagnosis found AnthropicTimeoutError on deep generation. Increased request timeout to 90 seconds, limited retries to one and output to 2400 tokens, and narrowed the lesson request to one worked example.
+- Validation: 39 tests pass; the 6 relevant coach/study tests also pass after timeout changes.
+
+
 ## Collapsible roadmap and on-demand depth
 - Moved roadmap styles to a dedicated stylesheet and versioned CSS URLs to avoid stale browser assets.
 - Stages start collapsed and expand into concise task lists.

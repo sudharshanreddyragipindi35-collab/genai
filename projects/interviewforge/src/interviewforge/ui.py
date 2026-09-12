@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Form, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from interviewforge.ai.amazon_client import call_amazon
@@ -146,6 +146,7 @@ def _practice_page(
     *,
     selected=None,
     task_id=None,
+    more_error=None,
     question: str | None = None,
     answer: str | None = None,
     response_kind: str | None = None,
@@ -177,9 +178,8 @@ def _practice_page(
             leetcode_mcp_configured=bool(request.app.state.settings.amazon_mcp_server_url),
             selected=selected,
             active_task=active_task,
-            study_content=(active_task.detailed_content or study_text(active_task))
-            if active_task
-            else "",
+            study_content=study_text(active_task) if active_task else "",
+            more_error=more_error,
             question=question,
             answer=answer,
             response_kind=response_kind,
@@ -399,14 +399,21 @@ def expand_lesson(request: Request, task_id: str = Form(max_length=120)):
     )
     if task is None:
         raise HTTPException(status_code=404, detail="Available lesson not found")
+    wants_json = "application/json" in request.headers.get("accept", "")
+
+    def success(content):
+        if wants_json:
+            return JSONResponse({"html": str(render_answer(content)), "saved": True})
+        return RedirectResponse(f"/practice?task={task.id}#deep-content", status_code=303)
+
     if task.detailed_content:
-        return RedirectResponse(f"/practice?task={task.id}#lesson-content", status_code=303)
+        return success(task.detailed_content)
     prompt = (
         f"Generate a deeper self-contained lesson for Amazon {roadmap.role}. "
         f"Experience: {roadmap.experience}; skills: {roadmap.skill}; "
         f"interview: {roadmap.target_date}; {roadmap.days_remaining} days remaining; "
         f"{roadmap.hours_per_day} hours/day. Topic: {task.title}. "
-        "The learner explicitly clicked More detail. Build on the base lesson rather than "
+        "The learner explicitly clicked More detail. Answer directly with one focused worked example, at most 800 words. Avoid delegation for this single lesson. Build on the base lesson rather than "
         "repeating it. Use structured sections: intuition, realistic worked example, step-by-step "
         "dry run, implementation or STAR/design breakdown as appropriate, common mistakes, "
         "role-specific follow-up questions, and a short exercise with a solution in a final section. "
@@ -427,12 +434,8 @@ def expand_lesson(request: Request, task_id: str = Form(max_length=120)):
             if saved_task:
                 saved_task.detailed_content = result.text
                 store(request).save(current)
-                return RedirectResponse(f"/practice?task={task.id}#lesson-content", status_code=303)
+                return success(result.text)
         raise HTTPException(status_code=409, detail="Your plan changed. Please reopen the lesson.")
-    return _practice_page(
-        request,
-        task_id=task.id,
-        question="More detail",
-        answer=result.text,
-        response_kind=result.kind,
-    )
+    if wants_json:
+        return JSONResponse({"detail": result.text}, status_code=503)
+    return _practice_page(request, task_id=task.id, more_error=result.text)

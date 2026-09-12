@@ -71,3 +71,44 @@ def test_more_generates_only_on_click_with_profile_and_saves(tmp_path, monkeypat
         locked = client.post("/practice/more", data={"task_id": plan.levels[1].tasks[0].id})
         assert locked.status_code == 404
         assert len(calls) == 1
+
+
+def test_more_json_returns_rendered_content_and_visible_retry_error(tmp_path, monkeypatch):
+    from interviewforge.ai.coach import CoachAnswer
+
+    settings = Settings(
+        _env_file=None, environment="test", local_state_path=tmp_path / "state.json"
+    )
+    plan = build_roadmap(
+        name="Learner",
+        experience="Student / fresher",
+        hours_per_day=1,
+        target_date=date.today() + timedelta(days=20),
+    )
+    RoadmapStore(settings.local_state_path).save(plan)
+    task = plan.levels[0].tasks[0]
+    monkeypatch.setattr(
+        "interviewforge.ui.answer_amazon_question",
+        lambda *args: CoachAnswer("Connection failed. Try again.", "error"),
+    )
+    with TestClient(create_app(settings)) as client:
+        response = client.post(
+            "/practice/more", data={"task_id": task.id}, headers={"Accept": "application/json"}
+        )
+        assert response.status_code == 503
+        assert response.json()["detail"] == "Connection failed. Try again."
+        assert (
+            not RoadmapStore(settings.local_state_path).load().levels[0].tasks[0].detailed_content
+        )
+        monkeypatch.setattr(
+            "interviewforge.ui.answer_amazon_question",
+            lambda *args: CoachAnswer("## Deep example\n\nWorked result.", "live"),
+        )
+        response = client.post(
+            "/practice/more", data={"task_id": task.id}, headers={"Accept": "application/json"}
+        )
+        assert response.status_code == 200
+        assert "<h2>Deep example</h2>" in response.json()["html"]
+        page = client.get("/practice?task=" + task.id)
+        assert "Understand the problem" in page.text
+        assert "Deep example" in page.text

@@ -87,8 +87,9 @@ def answer_amazon_question(
         model = model_factory(
             model_name=model_id,
             api_key=SecretStr(settings.anthropic_api_key.get_secret_value()),
-            timeout=30.0,
-            max_retries=2,
+            timeout=90.0,
+            max_tokens=2400,
+            max_retries=1,
         )
         agent = agent_factory(model=model)
         result = agent.invoke(
