@@ -1,5 +1,9 @@
 # GenAI and machine learning architecture
 
+## Implementation status
+
+This document includes the target architecture. For what works today, see the [implemented technology inventory](TECH_STACK.md). The local application already uses LangChain's Claude adapter, Deep Agents on LangGraph, specialist definitions, MCP retrieval and lexical RAG. Custom durable graphs, vector retrieval, learned models and production evaluation infrastructure described below remain planned.
+
 ## Architecture decision
 
 InterviewForge will use the Python Deep Agents SDK on the LangGraph runtime for complex, multi-step coaching and interview workflows. Deep Agents provides planning, specialist delegation, context management, durable execution, streaming and human review patterns. Simple generation stays behind a smaller model gateway so every request does not pay agent overhead.

@@ -1,6 +1,8 @@
 # InterviewForge
 
-InterviewForge is a planned AI-powered interview preparation product with persistent candidate progress, source-grounded company guidance, adaptive Python practice and hiring-journey simulations.
+InterviewForge is a local Amazon interview-preparation application with saved study progress, source-grounded guidance, personalized lessons and Python practice.
+
+**Stack: Python · FastAPI · LangChain · LangGraph (through Deep Agents) · Claude · RAG · MCP.** See the [technology and GenAI skills inventory](docs/TECH_STACK.md) for implementation evidence and remaining work.
 
 **Status: working local Phase 1 application slice with Amazon onboarding, a tracked roadmap, Claude coaching, and LeetCode MCP problem retrieval.** See the [development guide](docs/DEVELOPMENT.md) to run it.
 
@@ -17,7 +19,7 @@ InterviewForge is a planned AI-powered interview preparation product with persis
 
 The application starts with one company target and Python coding. Multi-company expansion, other coding languages, deep system-design workspace, billing, mobile apps and specialist model training are deferred.
 
-See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). The Amazon-only boundary is enforced before model invocation and in the MCP knowledge adapter. Authentication, PostgreSQL candidate ownership, a scored coding assessment, and reviewed Amazon knowledge retrieval remain future work.
+See [architecture](docs/ARCHITECTURE.md), [GenAI architecture](docs/GENAI_ARCHITECTURE.md), and [requirements mapping](docs/REQUIREMENTS.md). The Amazon-only boundary is enforced before model invocation and in the MCP knowledge adapter. Authentication, PostgreSQL candidate ownership and a scored coding assessment remain future work.
 The current local application supports an Amazon-only candidate journey:
 
 1. Select Amazon and enter the exam or interview date, experience, and daily study time.
@@ -28,13 +30,13 @@ The current local application supports an Amazon-only candidate journey:
 
 Roadmap progress is saved to the ignored `.interviewforge/state.json` local-preview file. Production persistence and candidate ownership remain PostgreSQL work.
 
-Public coding problems can be synchronized through a configured Streamable HTTP LeetCode MCP server. Until it is connected, the UI identifies its bundled public links as `curated`; it never represents them as MCP results.
+Reviewed Amazon-reported coding problems can be synchronized through a configured Streamable HTTP LeetCode MCP server. The registry is deliberately limited to attributed questions.
 
 
 ## Amazon learning flow
 
 Start at /onboarding. Choose SDE I or SDE II, experience, coding level, interview date, daily hours and optional job-specific GenAI. The first stage contains lessons and exercises before coding practice. SDE II adds system-design depth. Dates and repetition counts adapt to availability and skills.
 
-The owned Python Amazon MCP bridge retrieves official Leadership Principles and interview-preparation pages. Claude receives these sources and cites them. Coding sync uses reviewed Amazon interview reports and checks exact problem slugs through LeetCode MCP. The initial registry has two SDE I questions and one SDE II question; it is historical community evidence, not an official or exhaustive question bank.
+The owned Python Amazon MCP bridge retrieves official Leadership Principles and interview-preparation pages. Claude receives retrieved passages; source links are shown when requested. Coding sync uses reviewed Amazon interview reports and checks exact problem slugs through LeetCode MCP. The initial registry has two SDE I questions and one SDE II question; it is historical community evidence, not an official or exhaustive question bank.
 
 See the development guide for both local MCP services. Task completion and assessments remain self-reported prototype checkpoints, not validated hiring-readiness scores.

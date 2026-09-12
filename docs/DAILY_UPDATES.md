@@ -1,5 +1,13 @@
 # Daily updates
 
+## 2026-09-12 — GitHub technology and GenAI skills inventory
+
+- Replaced stale root README implementation status with the current local application capabilities.
+- Documented LangChain, LangGraph through Deep Agents, Claude, MCP, lexical RAG, prompt engineering and personalization with source-file evidence.
+- Distinguished implemented integrations from custom graphs, vector search, durable memory and model training that remain future work.
+- Corrected outdated application README statements about knowledge retrieval and source visibility.
+- Added GitHub framework topics and an updated project description.
+
 ## More detail inline results and lesson selector
 - Changed More detail to an inline request with a visible loading state and retry errors beside the button.
 - Kept the original lesson and displayed saved generated material in a separate deep-lesson section.
